@@ -345,7 +345,10 @@ def render_plant_hal(cfg: MachineConfig, js: list[Joint], atc_macro: str | None 
     out += [f"addf {sw.comp} servo-thread" for sw in inv]
     out += ["addf lrt-estop2.0 servo-thread", "addf estop_chain servo-thread",
             "addf estop_chain_hmi servo-thread", "addf estop_latch servo-thread", "",
-            "# ---- napędy (Plant przez LRT-NET) ----"]
+            "setp sim_toolchange.on-delay 0.1",
+            "net linumert.io.tool-change iocontrol.0.tool-change => sim_toolchange.in",
+            "net linumert.io.tool-changed sim_toolchange.out => iocontrol.0.tool-changed",
+            "", "# ---- napędy (Plant przez LRT-NET) ----"]
     out += [f"setp lrt-net.0.axis.{j.index}.scale [JOINT_{j.index}]SCALE" for j in js]
     out.append("")
     for j in js:
@@ -457,7 +460,10 @@ def render_sim_hal(cfg: MachineConfig, js: list[Joint]) -> str:
     out += [f"addf sim_j{j.index} servo-thread" for j in js]
     out += ["addf sim_toolchange servo-thread", "addf estop_latch servo-thread"]
     out += [f"addf home_j{j.index} servo-thread" for j, _ in homes]
-    out += ["", "# ---- napędy (sim) ----"]
+    out += ["", "setp sim_toolchange.on-delay 0.1",
+            "net linumert.io.tool-change iocontrol.0.tool-change => sim_toolchange.in",
+            "net linumert.io.tool-changed sim_toolchange.out => iocontrol.0.tool-changed",
+            "", "# ---- napędy (sim) ----"]
     for j in js:
         i = j.index
         out += [f"setp sim_j{i}.gain 1.0",
