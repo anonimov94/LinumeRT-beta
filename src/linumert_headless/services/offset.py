@@ -35,7 +35,7 @@ from .paths import ProjectPaths
 if TYPE_CHECKING:
     from .machine import MachineService
 
-PROBE_FEED_MM_MIN = 100.0  # posuw dokładnego przejazdu sondy [mm/min]
+PROBE_FEED_MM_MIN = 50.0  # posuw dokładnego przejazdu sondy [mm/min]
 MAX_PROBE_DISTANCE_MM = 200.0
 MAX_PROBE_FEED_MM_MIN = 1000.0
 
@@ -118,7 +118,11 @@ class ProbeRunIn(Model):
     distance: float = Field(10.0, gt=0, le=MAX_PROBE_DISTANCE_MM,
                             description="maksymalna droga szukania styku [mm]")
     feed: float | None = Field(None, gt=0, le=MAX_PROBE_FEED_MM_MIN,
-                               description="posuw [mm/min]; None = posuw kalibracji sondy")
+                               description="drugi, dokładny najazd [mm/min]; domyślnie 50")
+    approach_feed: float | None = Field(None, gt=0, le=MAX_PROBE_FEED_MM_MIN,
+                                         description="posuw pierwszego najazdu [mm/min]; domyślnie 100")
+    backoff: float = Field(1.5, ge=1.0, le=2.0,
+                           description="odjazd między najazdami [mm]")
     offset: str = Field("G54", pattern=r"^G5[4-9](\.[1-3])?$")
     value: float = Field(0.0, description="współrzędna powierzchni w układzie offset [mm]")
     retract: float = Field(2.0, gt=0, le=50.0, description="odjazd po styku [mm]")
@@ -272,8 +276,10 @@ class OffsetService:
                                               "calibration_feed": calibration.feed}) from exc
         correction = correction or 0.0
         target = round(request.value - correction, 6)
+        coarse = request.approach_feed if request.approach_feed is not None else 100.0
         gcode = probe_call(axis, request.direction, request.distance, feed, request.offset,
-                           target, request.retract)
+                           target, request.retract, approach_feed=coarse,
+                           backoff=request.backoff)
         machine.run_macro(gcode, "sondowanie", confirm=request.confirm, axis=axis,
                           capability="subroutines")
         return ProbeRunOut(axis=axis, direction=request.direction, offset=request.offset,
