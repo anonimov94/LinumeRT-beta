@@ -32,6 +32,8 @@ bench:
 	LRT_NATIVE=1 $(PYTHON) tools/bench_zmap.py
 	LRT_NATIVE=0 $(PYTHON) tools/bench_gcode.py
 	LRT_NATIVE=1 $(PYTHON) tools/bench_gcode.py
+	LRT_NATIVE=0 $(PYTHON) tools/bench_sim.py
+	LRT_NATIVE=1 $(PYTHON) tools/bench_sim.py
 
 # Rdzeń dynamiki Plant w C (C11, bez zależności).
 test-c:

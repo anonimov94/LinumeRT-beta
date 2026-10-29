@@ -21,6 +21,7 @@ from collections.abc import Callable
 from dataclasses import asdict, dataclass
 from pathlib import Path
 
+from . import native_sim
 from .engine import Sample, SimEngine
 from .path import KIND_RAPID, MoveList, load_path
 
@@ -88,6 +89,36 @@ def simulate(job: OfflineJob, progress: Callable[[float], None] | None = None,
     t = 0.0
     times = {"rapid": 0.0, "feed": 0.0}
     n = len(ml)
+    done = False
+    if n:
+        try:
+            events, t, times = native_sim.run(
+                engine, ml, dt=job.dt, rapid=job.rapid, origin=job.origin, progress=progress,
+                cancelled=cancelled,
+                cancel_exc=lambda i, total: Cancelled(f"anulowano po {i} z {total} odcinków"))
+            done = True
+        except native_sim.Unsupported:
+            pass       # konfiguracja poza zakresem rdzenia C: wzorcowa pętla poniżej
+    if not done:
+        events, t, times = _loop_python(engine, ml, job, progress, cancelled)
+    lo, hi = ml.bounds()
+    return {
+        "version": VERSION, "key": job.key(), "source": ml.source, "segments": n,
+        "lines": len(ml.lines()), "length_mm": round(ml.length(), 3),
+        "time_s": round(t, 3), "time_rapid_s": round(times["rapid"], 3),
+        "time_feed_s": round(times["feed"], 3),
+        "bounds": [[round(float(v), 3) for v in lo], [round(float(v), 3) for v in hi]],
+        "stock": line, "removed_mm3": round(volume0 - smap.volume(), 1) if smap else 0.0,
+        "events": events, "notes": notes,
+    }
+
+
+def _loop_python(engine: SimEngine, ml: MoveList, job: OfflineJob, progress, cancelled):
+    """Wzorcowa pętla w Pythonie (zapasowa, gdy brak rdzenia C)."""
+    events: list[dict] = []
+    t = 0.0
+    times = {"rapid": 0.0, "feed": 0.0}
+    n = len(ml)
     ox, oy, oz = job.origin
 
     def nose(p, tool: int) -> tuple[float, float, float]:
@@ -121,13 +152,4 @@ def simulate(job: OfflineJob, progress: Callable[[float], None] | None = None,
         t += seconds
         if progress is not None and (i % 200 == 0 or i == n - 1):
             progress((i + 1) / n)
-    lo, hi = ml.bounds()
-    return {
-        "version": VERSION, "key": job.key(), "source": ml.source, "segments": n,
-        "lines": len(ml.lines()), "length_mm": round(ml.length(), 3),
-        "time_s": round(t, 3), "time_rapid_s": round(times["rapid"], 3),
-        "time_feed_s": round(times["feed"], 3),
-        "bounds": [[round(float(v), 3) for v in lo], [round(float(v), 3) for v in hi]],
-        "stock": line, "removed_mm3": round(volume0 - smap.volume(), 1) if smap else 0.0,
-        "events": events, "notes": notes,
-    }
+    return events, t, times

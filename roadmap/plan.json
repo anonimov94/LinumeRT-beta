@@ -1281,13 +1281,13 @@
     {
       "id": "B-08",
       "area": "core",
-      "title": "Kolejne gorące ścieżki do C: leksyka G-code, tor narzędzia i estymacja czasu, kolizje brył",
-      "status": "planned",
-      "remaining": [
-        "Zostało w Pythonie: leksyka (linumert/programs/lexer.py, ~85 tys. linii/s) i estymacja z wyjścia rs274 (estimate_canon, ~170 tys. wywołań/s)",
-        "Kolizje brył są już tanie (3 µs/wywołanie) — nie przenosić bez nowego pomiaru"
-      ],
-      "evidence": []
+      "title": "Ocena gorących ścieżek pomiarem: kolizje, leksyka i estimate_canon świadomie w Pythonie (docs/NATIVE.md)",
+      "status": "done",
+      "remaining": [],
+      "evidence": [
+        "docs/NATIVE.md",
+        "tools/bench_sim.py"
+      ]
     },
     {
       "id": "B-09",
@@ -1300,6 +1300,19 @@
         "native/lrt_gcode.h",
         "tests/test_native_gcode.py",
         "tools/bench_gcode.py"
+      ]
+    },
+    {
+      "id": "B-10",
+      "area": "core",
+      "title": "Pętla symulacji offline w C (native/lrt_sim.c): 52–57x szybciej, parytet zdarzeń K-3xx z Pythonem; dystanse z math.dist",
+      "status": "done",
+      "remaining": [],
+      "evidence": [
+        "native/lrt_sim.c",
+        "native/lrt_sim.h",
+        "src/linumert_sim/native_sim.py",
+        "tests/test_native_sim.py"
       ]
     }
   ]

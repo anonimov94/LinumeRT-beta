@@ -55,6 +55,73 @@ class GcodeMoves(ctypes.Structure):
                 ("error", ctypes.c_int), ("error_msg", ctypes.c_char * 320)]
 
 
+def profile_of(cutter) -> int:
+    """Rodzaj profilu części tnącej jak w ``Cutter.lower`` (kolejność warunków ma znaczenie)."""
+    if cutter.kind in ("ball", "lollipop"):
+        return PROFILES["ball"]
+    if cutter.kind == "bull" and cutter.corner > 0:
+        return PROFILES["bull"]
+    if cutter.cone_tan > 0:
+        return PROFILES["cone"]
+    return PROFILES["flat"]
+
+
+class SimPart(ctypes.Structure):
+    _fields_ = [("name_id", ctypes.c_int), ("rank", ctypes.c_int),
+                ("r", ctypes.c_double), ("z", ctypes.c_double)]
+
+
+class SimCyl(ctypes.Structure):
+    _fields_ = [("name_id", ctypes.c_int), ("r", ctypes.c_double),
+                ("z0", ctypes.c_double), ("z1", ctypes.c_double)]
+
+
+class SimTool(ctypes.Structure):
+    _fields_ = [("number", ctypes.c_int), ("gauge", ctypes.c_double),
+                ("radius", ctypes.c_double), ("cut_top", ctypes.c_double),
+                ("max_rpm", ctypes.c_double), ("tap", ctypes.c_int), ("hand", ctypes.c_int),
+                ("undercut", ctypes.c_int), ("substitute", ctypes.c_int),
+                ("reach", ctypes.c_double), ("cutter", CutterC),
+                ("part_off", ctypes.c_int), ("n_parts", ctypes.c_int),
+                ("cyl_off", ctypes.c_int), ("n_cyl", ctypes.c_int)]
+
+
+class SimBody(ctypes.Structure):
+    _fields_ = [("name_id", ctypes.c_int), ("cylinder", ctypes.c_int),
+                ("moving", ctypes.c_int), ("fixture", ctypes.c_int),
+                ("toolsetter", ctypes.c_int), ("magazine", ctypes.c_int),
+                ("size", ctypes.c_double * 3), ("pos", ctypes.c_double * 3)]
+
+
+class SimConfig(ctypes.Structure):
+    _fields_ = [("dt", ctypes.c_double), ("rapid", ctypes.c_double),
+                ("origin", ctypes.c_double * 3), ("kc", ctypes.c_double),
+                ("spindle_power", ctypes.c_double),
+                ("curve_w", ctypes.POINTER(ctypes.c_double)),
+                ("curve_t", ctypes.POINTER(ctypes.c_double)), ("n_curve", ctypes.c_int),
+                ("axis_force", ctypes.c_double * 3), ("tool_name_id", ctypes.c_int),
+                ("tools", ctypes.POINTER(SimTool)), ("n_tools", ctypes.c_int),
+                ("parts", ctypes.POINTER(SimPart)), ("cyls", ctypes.POINTER(SimCyl)),
+                ("bodies", ctypes.POINTER(SimBody)), ("n_bodies", ctypes.c_int),
+                ("stock", ctypes.POINTER(ZMap)), ("n", ctypes.c_int64),
+                ("start", ctypes.POINTER(ctypes.c_float)),
+                ("end", ctypes.POINTER(ctypes.c_float)),
+                ("line", ctypes.POINTER(ctypes.c_int32)),
+                ("tool", ctypes.POINTER(ctypes.c_int32)),
+                ("kind", ctypes.POINTER(ctypes.c_int8)),
+                ("feed", ctypes.POINTER(ctypes.c_float)),
+                ("spindle", ctypes.POINTER(ctypes.c_float)),
+                ("dist", ctypes.POINTER(ctypes.c_double))]
+
+
+class SimEvent(ctypes.Structure):
+    _fields_ = [("code", ctypes.c_int), ("kind", ctypes.c_int), ("line", ctypes.c_int),
+                ("tool", ctypes.c_int), ("pos", ctypes.c_double * 3),
+                ("id_a", ctypes.c_int), ("id_b", ctypes.c_int),
+                ("i1", ctypes.c_long), ("i2", ctypes.c_long), ("i3", ctypes.c_long),
+                ("s1", ctypes.c_char * 40), ("s2", ctypes.c_char * 40)]
+
+
 def mode() -> str:
     return os.environ.get("LRT_NATIVE", "auto").strip().lower() or "auto"
 
@@ -91,6 +158,22 @@ def load() -> ctypes.CDLL | None:
     lib.lrt_gcode_parse.restype = ctypes.POINTER(GcodeMoves)
     lib.lrt_gcode_free.argtypes = [ctypes.POINTER(GcodeMoves)]
     lib.lrt_gcode_free.restype = None
+    lib.lrt_sim_new.argtypes = [ctypes.POINTER(SimConfig)]
+    lib.lrt_sim_new.restype = ctypes.c_void_p
+    lib.lrt_sim_free.argtypes = [ctypes.c_void_p]
+    lib.lrt_sim_free.restype = None
+    lib.lrt_sim_begin.argtypes = [ctypes.c_void_p]
+    lib.lrt_sim_begin.restype = ctypes.c_int
+    lib.lrt_sim_run.argtypes = [ctypes.c_void_p, ctypes.c_int64, ctypes.c_int64]
+    lib.lrt_sim_run.restype = ctypes.c_int
+    for name in ("time", "time_rapid", "time_feed"):
+        fn = getattr(lib, f"lrt_sim_{name}")
+        fn.argtypes = [ctypes.c_void_p]
+        fn.restype = ctypes.c_double
+    lib.lrt_sim_event_count.argtypes = [ctypes.c_void_p]
+    lib.lrt_sim_event_count.restype = ctypes.c_int64
+    lib.lrt_sim_events.argtypes = [ctypes.c_void_p]
+    lib.lrt_sim_events.restype = ctypes.POINTER(SimEvent)
     _lib = lib
     return lib
 

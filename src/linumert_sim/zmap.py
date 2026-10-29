@@ -108,6 +108,13 @@ class StockMap:
             self.version += 1
         return res
 
+    def native_struct(self):
+        """Opis mapy dla rdzenia C (wskaźnik na ``self.h``; mapa musi żyć dłużej niż struktura)."""
+        import ctypes
+
+        return native.ZMap(self.h.ctypes.data_as(ctypes.POINTER(ctypes.c_float)), self.nx,
+                           self.ny, self.x0, self.y0, self.cell, self.z_bottom, self.z_top)
+
     def _cut_native(self, lib, cutter: Cutter, p0, p1, parts, reach: float) -> CutResult:
         """Ta sama operacja w rdzeniu C (native/lrt_zmap.c); numpy zostaje wzorcem."""
         import ctypes
@@ -118,18 +125,9 @@ class StockMap:
         if hi_x < self.x0 or lo_x > self.x1 or hi_y < self.y0 or lo_y > self.y1:
             return res
         step = max(min(self.cell * 0.5, cutter.radius * 0.5), 0.02)
-        if cutter.kind in ("ball", "lollipop"):
-            profile = native.PROFILES["ball"]
-        elif cutter.kind == "bull" and cutter.corner > 0:
-            profile = native.PROFILES["bull"]
-        elif cutter.cone_tan > 0:
-            profile = native.PROFILES["cone"]
-        else:
-            profile = native.PROFILES["flat"]
+        profile = native.profile_of(cutter)
         dbl = ctypes.c_double
-        zmap = native.ZMap(self.h.ctypes.data_as(ctypes.POINTER(ctypes.c_float)), self.nx,
-                           self.ny, self.x0, self.y0, self.cell, self.z_bottom,
-                           self.z_top)
+        zmap = self.native_struct()
         cut = native.CutterC(profile, cutter.radius, cutter.corner, cutter.cone_tan)
         part_r = (dbl * max(len(parts), 1))(*[p[1] for p in parts])
         part_z = (dbl * max(len(parts), 1))(*[p[2] for p in parts])

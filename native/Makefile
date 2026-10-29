@@ -12,8 +12,8 @@ BUILD := build
 .PHONY: all test clean
 all: $(BUILD)/liblrt_native.so
 
-SRC := lrt_zmap.c lrt_gcode.c
-HDR := lrt_zmap.h lrt_gcode.h
+SRC := lrt_zmap.c lrt_gcode.c lrt_sim.c
+HDR := lrt_zmap.h lrt_gcode.h lrt_sim.h
 
 $(BUILD)/liblrt_native.so: $(SRC) $(HDR)
 	@mkdir -p $(BUILD)
