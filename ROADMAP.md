@@ -2,7 +2,7 @@
 
 > Plik GENEROWANY z `roadmap/plan.json` przez `python3 tools/roadmap.py render`. Nie edytuj ręcznie.
 
-Aktualizacja: 2026-10-29 · planowane: 12 · częściowe: 64 · ukończone: 9 · GUI (na końcu): 5 · zablokowane: 0
+Aktualizacja: 2026-10-29 · planowane: 19 · częściowe: 64 · ukończone: 10 · GUI (na końcu): 5 · zablokowane: 1
 
 - Po ukończeniu funkcji: python3 tools/roadmap.py done ID --evidence ŚCIEŻKA [...]. Narzędzie samo przepisuje ROADMAP.md.
 - Wszystko dotyczące prawdziwego sprzętu: NIEZWERYFIKOWANE NA SPRZĘCIE.
@@ -10,6 +10,15 @@ Aktualizacja: 2026-10-29 · planowane: 12 · częściowe: 64 · ukończone: 9 ·
 
 | ID | Obszar | Status | Zakres |
 |---|---|---|---|
+| A-00 | audit | ukończone | Audyt: plan działania P0/P1 zapisany w git (docs/PLAN_AUDYTU_P0_P1.md), wstrzymanie nowych funkcji do decyzji |
+| A-01 | audit | planowane | Audyt: uczciwość dokumentacji (fałszywe zdanie o wtyczkach, liczby generowane narzędziem) |
+| A-02 | audit | zablokowane | Audyt P0: jawny model joint↔oś (gantry X/Y1/Y2/Z, osie obrotowe), bezpieczna odmowa |
+| A-03 | audit | planowane | Audyt P1: jednostki i poprawność JOG (liniowe mm, obrotowe stopnie, jednostki INI) |
+| A-04 | audit | planowane | Audyt P1: autoryzacja — bezpieczne domyślne dla backendu linuxcnc, rozdział odczyt/sterowanie/serwis |
+| A-05 | audit | planowane | Audyt P1: wtyczki — fasada bez dostępu do usług sterowania, model zagrożeń |
+| A-06 | audit | planowane | Audyt P1: watchdog HAL, utrata procesu i ścieżka zatrzymania (fail-safe) |
+| A-07 | audit | planowane | Audyt P2: CI (lint, testy, C, sanitizery) i powtarzalne raporty |
+| A-08 | audit | planowane | Audyt P2: decyzja o kierunku — odziedziczony rdzeń vs nowe wdrożenie (PROVENANCE/DECYZJE) |
 | B-01 | core | ukończone | System wtyczek (plugins.py): katalog plugins/ + entry points, manifest, izolacja błędów |
 | B-02 | transport | ukończone | Transport socket JSON-lines (TCP + Unix), tryb --no-http |
 | B-03 | tooling | ukończone | Roadmapa beta + tools/roadmap.py (list/next/done/render/check) |
@@ -102,6 +111,38 @@ Aktualizacja: 2026-10-29 · planowane: 12 · częściowe: 64 · ukończone: 9 ·
 | 084 | M6 | planowane | Retrospektywa i kolejne półrocze |
 
 ## Pozostały zakres
+
+### A-01 Audyt: uczciwość dokumentacji (fałszywe zdanie o wtyczkach, liczby generowane narzędziem)
+- Plan: docs/PLAN_AUDYTU_P0_P1.md §4 A-01
+- Czeka na decyzję właściciela D1/D2
+
+### A-02 Audyt P0: jawny model joint↔oś (gantry X/Y1/Y2/Z, osie obrotowe), bezpieczna odmowa
+- Część integracyjna wymaga LinuxCNC 2.9 SIM (decyzja D0)
+- Plan: docs/PLAN_AUDYTU_P0_P1.md §4 A-02
+
+### A-03 Audyt P1: jednostki i poprawność JOG (liniowe mm, obrotowe stopnie, jednostki INI)
+- Plan: docs/PLAN_AUDYTU_P0_P1.md §4 A-03
+- Czeka na decyzję właściciela (D1, D0/D3/D4/D5/D6 wg etapu)
+
+### A-04 Audyt P1: autoryzacja — bezpieczne domyślne dla backendu linuxcnc, rozdział odczyt/sterowanie/serwis
+- Plan: docs/PLAN_AUDYTU_P0_P1.md §4 A-04
+- Czeka na decyzję właściciela (D1, D0/D3/D4/D5/D6 wg etapu)
+
+### A-05 Audyt P1: wtyczki — fasada bez dostępu do usług sterowania, model zagrożeń
+- Plan: docs/PLAN_AUDYTU_P0_P1.md §4 A-05
+- Czeka na decyzję właściciela (D1, D0/D3/D4/D5/D6 wg etapu)
+
+### A-06 Audyt P1: watchdog HAL, utrata procesu i ścieżka zatrzymania (fail-safe)
+- Plan: docs/PLAN_AUDYTU_P0_P1.md §4 A-06
+- Czeka na decyzję właściciela (D1, D0/D3/D4/D5/D6 wg etapu)
+
+### A-07 Audyt P2: CI (lint, testy, C, sanitizery) i powtarzalne raporty
+- Plan: docs/PLAN_AUDYTU_P0_P1.md §4 A-07
+- Czeka na decyzję właściciela (D1, D0/D3/D4/D5/D6 wg etapu)
+
+### A-08 Audyt P2: decyzja o kierunku — odziedziczony rdzeń vs nowe wdrożenie (PROVENANCE/DECYZJE)
+- Plan: docs/PLAN_AUDYTU_P0_P1.md §4 A-08
+- Czeka na decyzję właściciela (D1, D0/D3/D4/D5/D6 wg etapu)
 
 ### B-05 Rdzeń jako pakiet bez GUI: wydzielenie funkcji domen do wtyczek (kolejne domeny)
 - Przenosić po jednej domenie (np. sim, plant) do wtyczek, gdy rdzeń pozostaje stabilny
@@ -304,6 +345,7 @@ Aktualizacja: 2026-10-29 · planowane: 12 · częściowe: 64 · ukończone: 9 ·
 
 ## Dowody ukończenia
 
+- **A-00** — `docs/PLAN_AUDYTU_P0_P1.md`, `CODEX_STOP_READ.md`
 - **B-01** — `src/linumert_headless/plugins.py`, `tests/test_plugins.py`
 - **B-02** — `src/linumert_headless/transport/socket.py`, `tests/test_socket.py`
 - **B-03** — `roadmap/plan.json`, `tools/roadmap.py`, `tests/test_roadmap.py`

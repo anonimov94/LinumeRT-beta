@@ -1314,6 +1314,105 @@
         "src/linumert_sim/native_sim.py",
         "tests/test_native_sim.py"
       ]
+    },
+    {
+      "id": "A-01",
+      "area": "audit",
+      "title": "Audyt: uczciwość dokumentacji (fałszywe zdanie o wtyczkach, liczby generowane narzędziem)",
+      "status": "planned",
+      "remaining": [
+        "Plan: docs/PLAN_AUDYTU_P0_P1.md §4 A-01",
+        "Czeka na decyzję właściciela D1/D2"
+      ],
+      "evidence": []
+    },
+    {
+      "id": "A-02",
+      "area": "audit",
+      "title": "Audyt P0: jawny model joint↔oś (gantry X/Y1/Y2/Z, osie obrotowe), bezpieczna odmowa",
+      "status": "blocked",
+      "remaining": [
+        "Część integracyjna wymaga LinuxCNC 2.9 SIM (decyzja D0)",
+        "Plan: docs/PLAN_AUDYTU_P0_P1.md §4 A-02"
+      ],
+      "evidence": []
+    },
+    {
+      "id": "A-03",
+      "area": "audit",
+      "title": "Audyt P1: jednostki i poprawność JOG (liniowe mm, obrotowe stopnie, jednostki INI)",
+      "status": "planned",
+      "remaining": [
+        "Plan: docs/PLAN_AUDYTU_P0_P1.md §4 A-03",
+        "Czeka na decyzję właściciela (D1, D0/D3/D4/D5/D6 wg etapu)"
+      ],
+      "evidence": []
+    },
+    {
+      "id": "A-04",
+      "area": "audit",
+      "title": "Audyt P1: autoryzacja — bezpieczne domyślne dla backendu linuxcnc, rozdział odczyt/sterowanie/serwis",
+      "status": "planned",
+      "remaining": [
+        "Plan: docs/PLAN_AUDYTU_P0_P1.md §4 A-04",
+        "Czeka na decyzję właściciela (D1, D0/D3/D4/D5/D6 wg etapu)"
+      ],
+      "evidence": []
+    },
+    {
+      "id": "A-05",
+      "area": "audit",
+      "title": "Audyt P1: wtyczki — fasada bez dostępu do usług sterowania, model zagrożeń",
+      "status": "planned",
+      "remaining": [
+        "Plan: docs/PLAN_AUDYTU_P0_P1.md §4 A-05",
+        "Czeka na decyzję właściciela (D1, D0/D3/D4/D5/D6 wg etapu)"
+      ],
+      "evidence": []
+    },
+    {
+      "id": "A-06",
+      "area": "audit",
+      "title": "Audyt P1: watchdog HAL, utrata procesu i ścieżka zatrzymania (fail-safe)",
+      "status": "planned",
+      "remaining": [
+        "Plan: docs/PLAN_AUDYTU_P0_P1.md §4 A-06",
+        "Czeka na decyzję właściciela (D1, D0/D3/D4/D5/D6 wg etapu)"
+      ],
+      "evidence": []
+    },
+    {
+      "id": "A-07",
+      "area": "audit",
+      "title": "Audyt P2: CI (lint, testy, C, sanitizery) i powtarzalne raporty",
+      "status": "planned",
+      "remaining": [
+        "Plan: docs/PLAN_AUDYTU_P0_P1.md §4 A-07",
+        "Czeka na decyzję właściciela (D1, D0/D3/D4/D5/D6 wg etapu)"
+      ],
+      "evidence": []
+    },
+    {
+      "id": "A-08",
+      "area": "audit",
+      "title": "Audyt P2: decyzja o kierunku — odziedziczony rdzeń vs nowe wdrożenie (PROVENANCE/DECYZJE)",
+      "status": "planned",
+      "remaining": [
+        "Plan: docs/PLAN_AUDYTU_P0_P1.md §4 A-08",
+        "Czeka na decyzję właściciela (D1, D0/D3/D4/D5/D6 wg etapu)"
+      ],
+      "evidence": []
+    },
+    {
+      "id": "A-00",
+      "area": "audit",
+      "title": "Audyt: plan działania P0/P1 zapisany w git (docs/PLAN_AUDYTU_P0_P1.md), wstrzymanie nowych funkcji do decyzji",
+      "status": "done",
+      "remaining": [],
+      "evidence": [
+        "docs/PLAN_AUDYTU_P0_P1.md",
+        "CODEX_STOP_READ.md"
+      ]
     }
   ]
 }

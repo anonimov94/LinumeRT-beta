@@ -41,8 +41,9 @@ def save(plan: dict) -> None:
 
 
 def sort_key(item: dict) -> tuple:
+    """Kolejność: A-xx (audyt, najpierw), B-xx (beta), potem numerowane sesje 001–084."""
     ident = item["id"]
-    return (0, ident) if ident.startswith("B-") else (1, ident)
+    return (0 if ident.startswith("A-") else 1 if ident.startswith("B-") else 2, ident)
 
 
 def render(plan: dict) -> str:
