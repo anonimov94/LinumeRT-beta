@@ -23,6 +23,8 @@ import math
 import tempfile
 from pathlib import Path
 
+import numpy as np
+
 from linumert.generators.registry import GeneratorRegistry
 from linumert.programs import compiler, estimate, limits, lnx, step_editor
 from linumert.programs.files import read_editable, save_new_program
@@ -281,14 +283,9 @@ class ProgramService:
         rapid_mm = moves.length(KIND_RAPID)
         feed_mm = moves.length() - rapid_mm
         rapid_s = rapid_mm / RAPID_MM_S if rapid_mm else 0.0
-        feed_s = 0.0
-        for index in range(len(moves)):
-            if int(moves.kind[index]) == KIND_RAPID:
-                continue
-            speed = float(moves.feed[index])  # mm/min
-            length = float(moves.lengths[index])
-            if speed > 0:
-                feed_s += length / speed * 60.0
+        speed = moves.feed.astype(float)  # mm/min
+        cutting = (moves.kind != KIND_RAPID) & (speed > 0)
+        feed_s = float(np.sum(moves.lengths[cutting] / speed[cutting] * 60.0))
         limits_note = ""
         if ini.exists():
             try:

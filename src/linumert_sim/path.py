@@ -28,6 +28,8 @@ from pathlib import Path
 
 import numpy as np
 
+from . import native
+
 INCH = 25.4
 CHORD_TOL = 0.01            # [mm] maks. odległość cięciwy od łuku
 KIND_RAPID, KIND_FEED, KIND_ARC = 0, 1, 2
@@ -543,8 +545,41 @@ def _norm(value: str) -> str:
     return str(int(f)) if f == int(f) else f"{f:g}"
 
 
+def _parse_subset_native(lib, text: str, start: Sequence[float], metric: bool) -> MoveList:
+    """Ten sam interpreter podzbioru w C (native/lrt_gcode.c); wynik kopiowany do numpy."""
+    import ctypes
+
+    raw = text.encode("utf-8", errors="surrogateescape")
+    origin = (ctypes.c_double * 3)(*[float(v) for v in start])
+    handle = lib.lrt_gcode_parse(raw, len(raw), origin, 1 if metric else 0)
+    if not handle:
+        raise MemoryError("brak pamięci w interpreterze G-code")
+    try:
+        res = handle.contents
+        if res.error:
+            raise ValueError(res.error_msg.decode("utf-8", errors="replace"))
+        n = res.n
+
+        def take(ptr, dtype, shape):
+            if n == 0:
+                return np.zeros(shape, dtype=dtype)
+            return np.ctypeslib.as_array(ptr, shape=shape).astype(dtype, copy=True)
+
+        notes = tuple(res.notes.decode("utf-8").split("\n")) if res.notes_len else ()
+        return MoveList(take(res.start, np.float32, (n, 3)), take(res.end, np.float32, (n, 3)),
+                        take(res.line, np.int32, (n,)), take(res.tool, np.int32, (n,)),
+                        take(res.kind, np.int8, (n,)), take(res.feed, np.float32, (n,)),
+                        take(res.spindle, np.float32, (n,)), notes, "subset")
+    finally:
+        lib.lrt_gcode_free(handle)
+
+
 def parse_subset(text: str | Sequence[str], start: Sequence[float] = (0.0, 0.0, 0.0),
                  metric: bool = True) -> MoveList:
+    if isinstance(text, str):
+        lib = native.load()
+        if lib is not None:
+            return _parse_subset_native(lib, text, start, metric)
     lines = text.splitlines() if isinstance(text, str) else list(text)
     return SubsetInterpreter(start, metric).run(lines)
 

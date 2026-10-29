@@ -3,7 +3,7 @@
 PYTHON ?= python3
 PIP_FLAGS ?=
 
-.PHONY: serve-socket install lint test test-service test-c serve contract check-no-gui clean
+.PHONY: native bench serve-socket install lint test test-service test-c serve contract check-no-gui clean
 
 install:
 	$(PYTHON) -m pip install $(PIP_FLAGS) -e ".[dev]"
@@ -22,6 +22,16 @@ test-service:
 	$(PYTHON) -m pytest tests/test_contract.py tests/test_machine_service.py \
 		tests/test_services.py tests/test_transport_rest.py tests/test_transport_ws.py \
 		tests/test_cli_sdk.py tests/test_no_gui.py -q
+
+# Rdzeń natywny (native/, C11): szybkie jądra; Python ma wersję zapasową (LRT_NATIVE=0).
+native:
+	$(MAKE) -C native && $(MAKE) -C native test
+
+bench:
+	LRT_NATIVE=0 $(PYTHON) tools/bench_zmap.py
+	LRT_NATIVE=1 $(PYTHON) tools/bench_zmap.py
+	LRT_NATIVE=0 $(PYTHON) tools/bench_gcode.py
+	LRT_NATIVE=1 $(PYTHON) tools/bench_gcode.py
 
 # Rdzeń dynamiki Plant w C (C11, bez zależności).
 test-c:

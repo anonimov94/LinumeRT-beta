@@ -1263,6 +1263,44 @@
         "LICENSE",
         "SAFETY.md"
       ]
+    },
+    {
+      "id": "B-07",
+      "area": "core",
+      "title": "Rdzeń natywny C (native/): usuwanie materiału 2.5D 30x szybciej niż numpy, test parytetu",
+      "status": "done",
+      "remaining": [],
+      "evidence": [
+        "native/lrt_zmap.c",
+        "native/tests/test_zmap.c",
+        "src/linumert_sim/native.py",
+        "tests/test_native_zmap.py",
+        "tools/bench_zmap.py"
+      ]
+    },
+    {
+      "id": "B-08",
+      "area": "core",
+      "title": "Kolejne gorące ścieżki do C: leksyka G-code, tor narzędzia i estymacja czasu, kolizje brył",
+      "status": "planned",
+      "remaining": [
+        "Zostało w Pythonie: leksyka (linumert/programs/lexer.py, ~85 tys. linii/s) i estymacja z wyjścia rs274 (estimate_canon, ~170 tys. wywołań/s)",
+        "Kolizje brył są już tanie (3 µs/wywołanie) — nie przenosić bez nowego pomiaru"
+      ],
+      "evidence": []
+    },
+    {
+      "id": "B-09",
+      "area": "core",
+      "title": "Interpreter podzbioru G-code w C (native/lrt_gcode.c): 24x szybciej, parytet z Pythonem na 3000 losowych programów",
+      "status": "done",
+      "remaining": [],
+      "evidence": [
+        "native/lrt_gcode.c",
+        "native/lrt_gcode.h",
+        "tests/test_native_gcode.py",
+        "tools/bench_gcode.py"
+      ]
     }
   ]
 }

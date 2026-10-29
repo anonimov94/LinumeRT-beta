@@ -2,7 +2,7 @@
 
 > Plik GENEROWANY z `roadmap/plan.json` przez `python3 tools/roadmap.py render`. Nie edytuj ręcznie.
 
-Aktualizacja: 2026-10-29 · planowane: 12 · częściowe: 64 · ukończone: 5 · GUI (na końcu): 5 · zablokowane: 0
+Aktualizacja: 2026-10-29 · planowane: 13 · częściowe: 64 · ukończone: 7 · GUI (na końcu): 5 · zablokowane: 0
 
 - Po ukończeniu funkcji: python3 tools/roadmap.py done ID --evidence ŚCIEŻKA [...]. Narzędzie samo przepisuje ROADMAP.md.
 - Wszystko dotyczące prawdziwego sprzętu: NIEZWERYFIKOWANE NA SPRZĘCIE.
@@ -16,6 +16,9 @@ Aktualizacja: 2026-10-29 · planowane: 12 · częściowe: 64 · ukończone: 5 ·
 | B-04 | docs | ukończone | AGENTS.md i mapa repo dla modeli o małym kontekście |
 | B-05 | core | planowane | Rdzeń jako pakiet bez GUI: wydzielenie funkcji domen do wtyczek (kolejne domeny) |
 | B-06 | docs | ukończone | LICENSE (GPL-2.0) i SAFETY.md (brak funkcji bezpieczeństwa, wyłączenie odpowiedzialności) |
+| B-07 | core | ukończone | Rdzeń natywny C (native/): usuwanie materiału 2.5D 30x szybciej niż numpy, test parytetu |
+| B-08 | core | planowane | Kolejne gorące ścieżki do C: leksyka G-code, tor narzędzia i estymacja czasu, kolizje brył |
+| B-09 | core | ukończone | Interpreter podzbioru G-code w C (native/lrt_gcode.c): 24x szybciej, parytet z Pythonem na 3000 losowych programów |
 | 001 | M0 | częściowe | Szkielet repozytorium, CI i licencja |
 | 002 | M0 | częściowe | Wytyczne IP i rejestr pochodzenia |
 | 003 | M0 | częściowe | Spike: LinuxCNC 2.9 w środowisku agenta |
@@ -101,6 +104,10 @@ Aktualizacja: 2026-10-29 · planowane: 12 · częściowe: 64 · ukończone: 5 ·
 
 ### B-05 Rdzeń jako pakiet bez GUI: wydzielenie funkcji domen do wtyczek (kolejne domeny)
 - Przenosić po jednej domenie (np. sim, plant) do wtyczek, gdy rdzeń pozostaje stabilny
+
+### B-08 Kolejne gorące ścieżki do C: leksyka G-code, tor narzędzia i estymacja czasu, kolizje brył
+- Zostało w Pythonie: leksyka (linumert/programs/lexer.py, ~85 tys. linii/s) i estymacja z wyjścia rs274 (estimate_canon, ~170 tys. wywołań/s)
+- Kolizje brył są już tanie (3 µs/wywołanie) — nie przenosić bez nowego pomiaru
 
 ### 001 Szkielet repozytorium, CI i licencja
 - Zweryfikować w beta: kod przejęty z linumeRT jako ukończony; wskazać test beta jako dowód (tools/roadmap.py done)
@@ -305,3 +312,5 @@ Aktualizacja: 2026-10-29 · planowane: 12 · częściowe: 64 · ukończone: 5 ·
 - **B-03** — `roadmap/plan.json`, `tools/roadmap.py`, `tests/test_roadmap.py`
 - **B-04** — `AGENTS.md`, `docs/PLUGINS.md`, `docs/SOCKET.md`
 - **B-06** — `LICENSE`, `SAFETY.md`
+- **B-07** — `native/lrt_zmap.c`, `native/tests/test_zmap.c`, `src/linumert_sim/native.py`, `tests/test_native_zmap.py`, `tools/bench_zmap.py`
+- **B-09** — `native/lrt_gcode.c`, `native/lrt_gcode.h`, `tests/test_native_gcode.py`, `tools/bench_gcode.py`

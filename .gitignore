@@ -18,3 +18,6 @@ api/contract.local.json
 # Rdzeń dynamiki Plant w C.
 plant_core/build/
 plant_core/build-san/
+
+# Rdzeń natywny (C).
+native/build/

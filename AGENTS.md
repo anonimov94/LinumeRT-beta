@@ -12,7 +12,8 @@ Czytaj TYLKO ten plik na start (≈2 min), potem tylko pliki ze swojego zadania.
 5. Sprzęt: wszystko, czego nie da się sprawdzić na atrapie/Plant, oznacz `NIEZWERYFIKOWANE NA SPRZĘCIE`.
 6. Nowa funkcja = **wtyczka**, chyba że dotyka bezpieczeństwa/rdzenia (wtedy rdzeń + test).
 7. Pliki ≤ ~400 linii; komentarze i komunikaty po polsku; nagłówek `SPDX-License-Identifier: GPL-2.0-or-later`.
-8. Po zmianie operacji: `make contract` (regeneruje `api/contract.json`), potem `make lint test`.
+8. **Gorąca pętla numeryczna → C** w `native/` (C11, bez zależności, `-ffp-contract=off`), Python zostaje cienkim wiązaniem + wersją zapasową; dodaj test parytetu z numpy i pomiar (`tools/bench_*.py`).
+9. Po zmianie operacji: `make contract` (regeneruje `api/contract.json`), potem `make lint test`.
 
 ## Architektura w 10 linijkach
 ```
@@ -35,6 +36,7 @@ Złożenie aplikacji: `build_application()` w `src/linumert_headless/app.py`.
 | Klient w innym języku / skrypt | `docs/SOCKET.md` (JSON-lines, bez zależności) |
 | Generator G-code | `src/linumert/generators/` + `tests/test_gen_*.py` |
 | Generator konfiguracji LinuxCNC | `src/linumert/machine/configgen*.py` |
+| Szybkie jądra w C (hot path) | `native/` (`make native`), wiązanie `src/linumert_sim/native.py`, wzorzec `zmap.py::_cut_native` |
 | Wirtualna maszyna / napędy | `src/linumert_plant/`, `plant_core/` |
 | Co zostało do zrobienia | `python3 tools/roadmap.py next`, `list --status partial` |
 
@@ -42,6 +44,7 @@ Złożenie aplikacji: `build_application()` w `src/linumert_headless/app.py`.
 ```
 make install        # venv + zależności (pip install -e ".[dev]")
 make test           # pełne testy lokalne (bez LinuxCNC, Qt, X)
+make native         # kompiluje i testuje rdzeń C (native/); make bench = numpy vs C
 make lint           # ruff + strażnik "bez GUI"
 make serve          # REST+WS na 127.0.0.1:8080
 .venv/bin/linumertd serve --no-http --socket-port 8765    # tylko socket, bez FastAPI

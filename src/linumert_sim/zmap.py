@@ -18,6 +18,7 @@ from dataclasses import dataclass, field
 
 import numpy as np
 
+from . import native
 from .cutter import Cutter
 
 EPS = 1e-3          # [mm] zagłębienie uznawane za kontakt
@@ -87,6 +88,9 @@ class StockMap:
         res = CutResult()
         parts = list(cutter.parts()) + list(extra_parts)
         reach = max([cutter.radius] + [p[1] for p in parts])
+        lib = native.load()
+        if lib is not None and len(parts) <= native.MAX_PARTS:
+            return self._cut_native(lib, cutter, p0, p1, parts, reach)
         lo_x, hi_x = min(p0[0], p1[0]) - reach, max(p0[0], p1[0]) + reach
         lo_y, hi_y = min(p0[1], p1[1]) - reach, max(p0[1], p1[1]) + reach
         if hi_x < self.x0 or lo_x > self.x1 or hi_y < self.y0 or lo_y > self.y1:
@@ -100,6 +104,45 @@ class StockMap:
             t = i / n
             p = tuple(a + (b - a) * t for a, b in zip(p0, p1, strict=True))
             res.merge(self._stamp(cutter, p, parts, reach))
+        if res.removed > 0:
+            self.version += 1
+        return res
+
+    def _cut_native(self, lib, cutter: Cutter, p0, p1, parts, reach: float) -> CutResult:
+        """Ta sama operacja w rdzeniu C (native/lrt_zmap.c); numpy zostaje wzorcem."""
+        import ctypes
+
+        res = CutResult()
+        lo_x, hi_x = min(p0[0], p1[0]) - reach, max(p0[0], p1[0]) + reach
+        lo_y, hi_y = min(p0[1], p1[1]) - reach, max(p0[1], p1[1]) + reach
+        if hi_x < self.x0 or lo_x > self.x1 or hi_y < self.y0 or lo_y > self.y1:
+            return res
+        step = max(min(self.cell * 0.5, cutter.radius * 0.5), 0.02)
+        if cutter.kind in ("ball", "lollipop"):
+            profile = native.PROFILES["ball"]
+        elif cutter.kind == "bull" and cutter.corner > 0:
+            profile = native.PROFILES["bull"]
+        elif cutter.cone_tan > 0:
+            profile = native.PROFILES["cone"]
+        else:
+            profile = native.PROFILES["flat"]
+        dbl = ctypes.c_double
+        zmap = native.ZMap(self.h.ctypes.data_as(ctypes.POINTER(ctypes.c_float)), self.nx,
+                           self.ny, self.x0, self.y0, self.cell, self.z_bottom,
+                           self.z_top)
+        cut = native.CutterC(profile, cutter.radius, cutter.corner, cutter.cone_tan)
+        part_r = (dbl * max(len(parts), 1))(*[p[1] for p in parts])
+        part_z = (dbl * max(len(parts), 1))(*[p[2] for p in parts])
+        out = native.CutResultC()
+        rc = lib.lrt_zmap_cut(ctypes.byref(zmap), ctypes.byref(cut), part_r, part_z,
+                              len(parts), (dbl * 3)(*p0), (dbl * 3)(*p1), step, reach,
+                              ctypes.byref(out))
+        if rc != 0:
+            raise ValueError("rdzeń natywny odrzucił argumenty przejazdu")
+        res.removed = out.removed
+        res.parts = {parts[i][0] for i in range(len(parts)) if out.parts_mask >> i & 1}
+        if out.has_contact:
+            res.contact_at = (out.contact[0], out.contact[1], out.contact[2])
         if res.removed > 0:
             self.version += 1
         return res
