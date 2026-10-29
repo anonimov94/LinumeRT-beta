@@ -370,10 +370,14 @@ def _evaluate_probe(res: ScenarioResult, kind: str, arg: dict[str, Any], axis: s
             else:  # stała poprawka z wzorca (jak core/linumert/programs/probe_calibration.py)
                 got -= ref - float(cal["value"])
                 label += f" po kalibracji na {cal['capture']}"
-        ok = got is not None and abs(got - float(arg["value"])) <= tol
+        # W odbiorze 1 µm wymagamy nierówności ostrej, nie domyślnego <=.
+        strict = bool(arg.get("strict", False))
+        error = None if got is None else got - float(arg["value"])
+        ok = error is not None and (abs(error) < tol if strict else abs(error) <= tol)
+        label += " (ściśle)" if strict else ""
         res.criteria.append(Criterion(label, ok,
-                                      "brak pomiaru" if got is None else
-                                      f"{got:.4f} (błąd {got - float(arg['value']):+.4f} mm)"))
+                                      "brak pomiaru" if error is None else
+                                      f"{got:.7f} (błąd {error:+.7f} mm)"))
 
 
 # ---- atrapa mastera -----------------------------------------------------------------------
