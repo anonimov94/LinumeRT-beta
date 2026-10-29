@@ -1,30 +1,29 @@
-"""Makro sondowania jednej osi ``o<lrt_probe>`` i budowa jego wywołania.
+"""Dwuetapowe sondowanie osi LinuxCNC 2.9 — dwa G38.2, wynik z drugiego styku.
 
 SPDX-License-Identifier: GPL-2.0-or-later
-Model-Author: Claude
+Model-Author: Claude (wersja bazowa), ChatGPT (dwa najazdy)
 
-Sondowanie to jedno polecenie MDI ``o<lrt_probe> call [...]`` (CLAUDE.md §8): LinuxCNC
-wykonuje G38.2, zapisuje offset przez G10 L20 i odjeżdża — bez czekania aplikacji na koniec
-każdego kroku. Po G38.2 maszyna stoi kawałek za punktem styku (hamowanie), więc wartość
-dla G10 L20 liczymy względem punktu styku: ``#<_x> - #5061 + wartość`` (różnica pozycji
-bieżącej i punktu styku nie zależy od układu, więc wzór działa dla dowolnego P).
-
-Plik makra leży w katalogu ``SUBROUTINE_PATH`` konfiguracji (``macros/lrt_probe.ngc``);
-generator konfiguracji dokłada go do wygenerowanych plików. NIEZWERYFIKOWANE NA SPRZĘCIE.
+Odjazd między najazdami 1–2 mm, drugie podejście wolniejsze. G10 L20
+dopiero po udanym drugim G38.2. M73 przywraca modalność po normalnym
+powrocie (nie po ABORT). Wartości długości w mm, posuw w mm/min.
+NIEZWERYFIKOWANE NA SPRZĘCIE.
 """
 
 from __future__ import annotations
 
 PROBE_AXES = ("X", "Y", "Z")
+FINE_OVERRUN_MM = 0.5  # dodatkowa droga po poprzednim styku, gdy drugi nie zadziala
 WORK_OFFSETS = ("G54", "G55", "G56", "G57", "G58", "G59", "G59.1", "G59.2", "G59.3")
 
 _AXIS_BLOCK = """\
   G91
   G38.2 {a}#<dist> F#4
+  G1 {a}#<backoff_move> F#4
+  G38.2 {a}#<fine_dist> F#<fine_feed>
   G90
   G10 L20 P#5 {a}[#<_{l}> - #{param} + #6]
   G91
-  G0 {a}#<back>"""
+  G0 {a}#<final_back>"""
 
 
 def _branch(index: int) -> str:
@@ -34,37 +33,52 @@ def _branch(index: int) -> str:
 
 PROBE_MACRO = f"""\
 ; SPDX-License-Identifier: GPL-2.0-or-later
-; Model-Author: Claude
-; linumeRT - sondowanie jednej osi (operacja offset.probe_run). Wywolanie:
-;   o<lrt_probe> call [os] [kierunek] [droga] [posuw] [P] [wartosc] [odjazd]
-; os: 0=X 1=Y 2=Z; kierunek +1/-1; droga i odjazd > 0 [mm]; P: 1..9 = G54..G59.3;
-; wartosc: wspolrzedna punktu styku w ukladzie P (juz z poprawka kalibracji sondy).
-; G38.2 konczy sie bledem, gdy sonda nie zadziala na drodze - offset nie jest wtedy zapisany.
+; Model-Author: Claude, ChatGPT
+; o<lrt_probe> call [os 0=X 1=Y 2=Z] [kierunek +/-1] [droga mm]
+;   [posuw pierwszy mm/min] [P 1..9] [wartosc] [odjazd koncowy mm]
+;   [posuw dokladny mm/min] [cofniecie miedzy najazdami 1..2 mm]
+; Brak arg 8/9: drugi posuw = pierwszy, cofniecie = 1.5 mm.
+; Brak styku G38.2 zatrzymuje makro przed G10 L20.
 o<lrt_probe> sub
-#<abs> = #<_absolute>
-#<dist> = [#2 * #3]
-#<back> = [0 - #2 * #7]
-o10 if [#1 EQ 0]
-{_branch(0)}
-o10 elseif [#1 EQ 1]
-{_branch(1)}
-o10 else
-{_branch(2)}
-o10 endif
-o20 if [#<abs> EQ 1]
-  G90
-o20 endif
+  M73
+  #<fine_feed> = #8
+  o80 if [#<fine_feed> LE 0]
+    #<fine_feed> = #4
+  o80 endif
+  #<backoff> = #9
+  o81 if [#<backoff> LE 0]
+    #<backoff> = 1.5
+  o81 endif
+  #<dist> = [#2 * #3]
+  #<backoff_move> = [0 - #2 * #<backoff>]
+  #<fine_dist> = [#2 * [#<backoff> + ${FINE_OVERRUN_MM}]]
+  #<final_back> = [0 - #2 * #7]
+  G21 G94
+  o10 if [#1 EQ 0]
+${_branch(0)}
+  o10 elseif [#1 EQ 1]
+${_branch(1)}
+  o10 elseif [#1 EQ 2]
+${_branch(2)}
+  o10 else
+    (abort, lrt_probe: niepoprawna os)
+  o10 endif
 o<lrt_probe> endsub
 M2
 """
 
 
 def probe_call(axis: str, direction: int, distance: float, feed: float, offset: str,
-               value: float, retract: float) -> str:
-    """Wywołanie makra; walidację zakresów robi warstwa usługi, tu tylko kształt."""
+               value: float, retract: float, *, approach_feed: float | None = None,
+               backoff: float = 1.5) -> str:
+    """Wygeneruj MDI dwóch najazdów (posuw pomiarowy = `feed`).
+
+    Warstwa usługi waliduje zakresy i potwierdzenie operatora.
+    """
     index = PROBE_AXES.index(axis.upper())
     p = WORK_OFFSETS.index(offset) + 1
-    args = (index, direction, distance, feed, p, value, retract)
+    coarse = feed if approach_feed is None else approach_feed
+    args = (index, direction, distance, coarse, p, value, retract, feed, backoff)
     return "o<lrt_probe> call " + " ".join(f"[{_num(v)}]" for v in args)
 
 

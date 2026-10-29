@@ -1,0 +1,48 @@
+# SPDX-License-Identifier: GPL-2.0-or-later
+# Model-Author: ChatGPT; test nie uruchomiony w LinuxCNC
+name: probe_xyz_bidirectional_precision
+description: "Surowa dokładność XYZ w LinuxCNC/Plant, bez kalibracji, wszystkie kierunki przy 50 mm/min"
+requirements: [REQ-VM-09]
+machine: ../../config/machines/mill_servo_table.yaml
+master: linuxcnc
+duration: 400
+steps:
+  - {at: 0.1, action: enable}
+  - {at: 0.3, action: mdi, command: "G21 G90 G49 G10 L2 P1 X0 Y0 Z0 R0", settle: true}
+  - {at: 1, action: mdi, command: "G90 G53 G0 Z-5", settle: true}
+  - {at: 2, action: mdi, command: "G53 G0 X200 Y400", settle: true}
+  - {at: 3, action: mdi, command: "G53 G0 Z-40", settle: true}
+  - {at: 4, action: mdi, command: "G91 G38.2 X100 F50", settle: true, timeout: 180}
+  - {at: 5, action: capture, name: xp}
+  - {at: 6, action: mdi, command: "G90 G53 G0 Z-5", settle: true}
+  - {at: 7, action: mdi, command: "G53 G0 X400 Y400", settle: true}
+  - {at: 8, action: mdi, command: "G53 G0 Z-40", settle: true}
+  - {at: 9, action: mdi, command: "G91 G38.2 X-100 F50", settle: true, timeout: 180}
+  - {at: 10, action: capture, name: xm}
+  - {at: 11, action: mdi, command: "G90 G53 G0 Z-5", settle: true}
+  - {at: 12, action: mdi, command: "G53 G0 X300 Y300", settle: true}
+  - {at: 13, action: mdi, command: "G53 G0 Z-40", settle: true}
+  - {at: 14, action: mdi, command: "G91 G38.2 Y100 F50", settle: true, timeout: 180}
+  - {at: 15, action: capture, name: yp}
+  - {at: 16, action: mdi, command: "G90 G53 G0 Z-5", settle: true}
+  - {at: 17, action: mdi, command: "G53 G0 X300 Y500", settle: true}
+  - {at: 18, action: mdi, command: "G53 G0 Z-40", settle: true}
+  - {at: 19, action: mdi, command: "G91 G38.2 Y-100 F50", settle: true, timeout: 180}
+  - {at: 20, action: capture, name: ym}
+  - {at: 21, action: mdi, command: "G90 G53 G0 Z-5", settle: true}
+  - {at: 22, action: mdi, command: "G53 G0 X300 Y400", settle: true}
+  - {at: 23, action: mdi, command: "G53 G0 Z-5", settle: true}
+  - {at: 24, action: mdi, command: "G91 G38.2 Z-100 F50", settle: true, timeout: 180}
+  - {at: 25, action: capture, name: zm}
+expect:
+  - no_alarm: {}
+  - probe_tripped: {capture: xp, value: true}
+  - probed: {capture: xp, axis: X, value: 250, tol: 0.001, strict: true}
+  - probe_tripped: {capture: xm, value: true}
+  - probed: {capture: xm, axis: X, value: 350, tol: 0.001, strict: true}
+  - probe_tripped: {capture: yp, value: true}
+  - probed: {capture: yp, axis: Y, value: 350, tol: 0.001, strict: true}
+  - probe_tripped: {capture: ym, value: true}
+  - probed: {capture: ym, axis: Y, value: 450, tol: 0.001, strict: true}
+  - probe_tripped: {capture: zm, value: true}
+  - probed: {capture: zm, axis: Z, value: -30, tol: 0.001, strict: true}

@@ -315,6 +315,9 @@ def render_plant_hal(cfg: MachineConfig, js: list[Joint], atc_macro: str | None 
     n = len(js)
     sws = switches(cfg)
     inv = [sw for sw in sws if sw.nc]
+    # NC: sygnał elektryczny 1=spoczynek, natomiast motion.probe-input 1=styk.
+    probe_nc = cfg.probe is not None and cfg.probe.contact == "NC"
+    inverter_names = [sw.comp for sw in inv] + (["probe_nc"] if probe_nc else [])
     outs, ins = atc_dio(atc_macro) if atc_macro else ([], [])
     dio = f" num_dio={max(outs + ins) + 1}" if outs or ins else ""
     inputs = cfg.io.inputs
@@ -335,17 +338,20 @@ def render_plant_hal(cfg: MachineConfig, js: list[Joint], atc_macro: str | None 
         "# Shared postgui expects this virtual M6 acknowledgement, also used by sim.",
         "loadrt timedelay names=sim_toolchange",
     ]
-    if inv:
-        out.append(f"loadrt not names={','.join(sw.comp for sw in inv)}")
+    if inverter_names:
+        out.append(f"loadrt not names={','.join(inverter_names)}")
     out += ["loadrt and2 names=estop_chain,estop_chain_hmi", "loadrt estop_latch names=estop_latch",
             "loadrt lrt_estop2", "",
             "addf motion-command-handler servo-thread", "addf motion-controller servo-thread"]
     out += [f"addf lrt-cia402.{j.index} servo-thread" for j in js]
     out += ["addf lrt-net.0 servo-thread", "addf sim_toolchange servo-thread"]
-    out += [f"addf {sw.comp} servo-thread" for sw in inv]
+    out += [f"addf {name} servo-thread" for name in inverter_names]
     out += ["addf lrt-estop2.0 servo-thread", "addf estop_chain servo-thread",
             "addf estop_chain_hmi servo-thread", "addf estop_latch servo-thread", "",
-            "# ---- napędy (Plant przez LRT-NET) ----"]
+            "setp sim_toolchange.on-delay 0.1",
+            "net linumert.io.tool-change iocontrol.0.tool-change => sim_toolchange.in",
+            "net linumert.io.tool-changed sim_toolchange.out => iocontrol.0.tool-changed",
+            "", "# ---- napędy (Plant przez LRT-NET) ----"]
     out += [f"setp lrt-net.0.axis.{j.index}.scale [JOINT_{j.index}]SCALE" for j in js]
     out.append("")
     for j in js:
@@ -373,8 +379,12 @@ def render_plant_hal(cfg: MachineConfig, js: list[Joint], atc_macro: str | None 
                         else f"lrt-net.0.din-{sw.din:02d}")
     out += ["", "# ---- sonda ----"]
     if cfg.probe is not None:
-        out.append(f"net linumert.io.probe        lrt-net.0.din-{inputs[cfg.probe.input]:02d} "
-                   "=> motion.probe-input")
+        probe_pin = f"lrt-net.0.din-{inputs[cfg.probe.input]:02d}"
+        if probe_nc:
+            out.append(f"net linumert.io.probe-raw    {probe_pin} => probe_nc.in")
+            out.append("net linumert.io.probe        probe_nc.out => motion.probe-input")
+        else:
+            out.append(f"net linumert.io.probe        {probe_pin} => motion.probe-input")
     if cfg.positions.tool_setter is not None:
         out.append(f"net linumert.io.toolsetter   "
                    f"lrt-net.0.din-{inputs[cfg.positions.tool_setter.input]:02d}")
@@ -457,7 +467,10 @@ def render_sim_hal(cfg: MachineConfig, js: list[Joint]) -> str:
     out += [f"addf sim_j{j.index} servo-thread" for j in js]
     out += ["addf sim_toolchange servo-thread", "addf estop_latch servo-thread"]
     out += [f"addf home_j{j.index} servo-thread" for j, _ in homes]
-    out += ["", "# ---- napędy (sim) ----"]
+    out += ["", "setp sim_toolchange.on-delay 0.1",
+            "net linumert.io.tool-change iocontrol.0.tool-change => sim_toolchange.in",
+            "net linumert.io.tool-changed sim_toolchange.out => iocontrol.0.tool-changed",
+            "", "# ---- napędy (sim) ----"]
     for j in js:
         i = j.index
         out += [f"setp sim_j{i}.gain 1.0",
