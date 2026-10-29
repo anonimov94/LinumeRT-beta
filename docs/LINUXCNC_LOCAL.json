@@ -1,0 +1,16 @@
+{
+  "result": "PASS",
+  "backend": "LinuxCNC 2.9 sim, POSIX non-realtime",
+  "checks": [
+    "DISPLAY launcher",
+    "REST state",
+    "reset and power",
+    "home XYZ",
+    "X increment 0.1 mm, error below 0.001 mm",
+    "MDI X1",
+    "E-STOP"
+  ],
+  "jog_start": 5.0,
+  "jog_end": 5.1,
+  "hardware_verified": false
+}

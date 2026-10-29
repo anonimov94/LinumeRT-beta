@@ -1,0 +1,13 @@
+{"schema_version": 1, "fresh": true, "age_s": 0.0001, "task_state": "estop", "mode": "manual", "interp_state": "idle", "axes": [{"name": "X", "position": 0.0, "commanded": 0.0, "work_position": 0.0, "following_error": 0.0, "homed": false, "soft_min": 0.0, "soft_max": 600.0, "limit_hit": false}, {"name": "Y", "position": 0.0, "commanded": 0.0, "work_position": 0.0, "following_error": 0.0, "homed": false, "soft_min": 0.0, "soft_max": 400.0, "limit_hit": false}, {"name": "Z", "position": 0.0, "commanded": 0.0, "work_position": 0.0, "following_error": 0.0, "homed": false, "soft_min": -120.0, "soft_max": 0.0, "limit_hit": false}], "all_homed": false, "current_line": 0, "program": "", "feed_override": 1.0, "rapid_override": 1.0, "spindle": {"speed": 0.0, "direction": 0, "override": 1.0, "running": false}, "tool_number": 0, "work_offset_name": "G54", "work_offset": {"X": 0.0, "Y": 0.0, "Z": 0.0}, "gcodes": ["G80", "G17", "G40", "G21", "G90", "G94", "G54", "G49", "G99", "G64", "G97", "G91.1", "G8"], "mcodes": ["M5", "M9", "M48", "M53", "M0"], "errors": [], "backend": "linuxcnc"}
+{'ok': True, 'message': 'E-STOP zresetowany; wymagane włączenie zasilania', 'details': {}}
+{'ok': True, 'message': 'zasilanie włączone', 'details': {}}
+{"schema_version": 1, "fresh": true, "age_s": 0.0001, "task_state": "on", "mode": "manual", "interp_state": "idle", "axes": [{"name": "X", "position": 0.0, "commanded": 0.0, "work_position": 0.0, "following_error": 0.0, "homed": false, "soft_min": 0.0, "soft_max": 600.0, "limit_hit": false}, {"name": "Y", "position": 0.0, "commanded": 0.0, "work_position": 0.0, "following_error": 0.0, "homed": false, "soft_min": 0.0, "soft_max": 400.0, "limit_hit": false}, {"name": "Z", "position": 0.0, "commanded": 0.0, "work_position": 0.0, "following_error": 0.0, "homed": false, "soft_min": -120.0, "soft_max": 0.0, "limit_hit": false}], "all_homed": false, "current_line": 0, "program": "", "feed_override": 1.0, "rapid_override": 1.0, "spindle": {"speed": 0.0, "direction": 0, "override": 1.0, "running": false}, "tool_number": 0, "work_offset_name": "G54", "work_offset": {"X": 0.0, "Y": 0.0, "Z": 0.0}, "gcodes": ["G80", "G17", "G40", "G21", "G90", "G94", "G54", "G49", "G99", "G64", "G97", "G91.1", "G8"], "mcodes": ["M5", "M9", "M48", "M53", "M0"], "errors": [], "backend": "linuxcnc"}
+{'ok': True, 'message': 'bazowanie wszystkich osi', 'details': {}}
+HOME PASS
+JOG PASS 5.0 5.1
+MDI PASS
+Traceback (most recent call last):
+  File "/probe.py", line 47, in <module>
+    assert c.machine.state()["task_state"]=="estop"
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError

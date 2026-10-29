@@ -1,0 +1,2 @@
+linumeRT headless 0.1.0: backend fake, API http://127.0.0.1:47987/api/v1  (bez GUI)
+token API ustawiony — przekaż go w nagłówku X-LRT-Token

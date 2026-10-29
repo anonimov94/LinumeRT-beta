@@ -1,0 +1,9 @@
+Machine configuration file is 'linumert_xyz.ini'
+Starting LinuxCNC...
+linuxcnc TPMOD=tpmod HOMEMOD=homemod EMCMOT=motmod
+Note: Using POSIX non-realtime
+Found file(REL): ./linumert_sim.hal
+link (updating variable file): No such file or directory
+linumeRT headless 0.1.0: backend linuxcnc, API http://127.0.0.1:8080/api/v1  (bez GUI)
+2026-10-29 05:26:22,007 INFO linumert.app: deadman jogu wygasł — stop X
+task: main loop took 0.140700 seconds

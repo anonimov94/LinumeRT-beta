@@ -1,0 +1,1268 @@
+{
+  "schema_version": 1,
+  "updated": "2026-10-29",
+  "policy": {
+    "statuses": [
+      "planned",
+      "partial",
+      "done",
+      "gui_later",
+      "blocked"
+    ],
+    "rule": "Po ukończeniu funkcji: python3 tools/roadmap.py done ID --evidence ŚCIEŻKA [...]. Narzędzie samo przepisuje ROADMAP.md.",
+    "hardware": "Wszystko dotyczące prawdziwego sprzętu: NIEZWERYFIKOWANE NA SPRZĘCIE.",
+    "origin": "Pozycje numerowane 001–084 pochodzą z rejestru linumeRT (stan 2026-10-25); status 'origin.status' to stan tam, nie dowód w beta (verified_in_beta=false do czasu sprawdzenia)."
+  },
+  "items": [
+    {
+      "id": "B-01",
+      "area": "core",
+      "title": "System wtyczek (plugins.py): katalog plugins/ + entry points, manifest, izolacja błędów",
+      "status": "done",
+      "remaining": [],
+      "evidence": [
+        "src/linumert_headless/plugins.py",
+        "tests/test_plugins.py"
+      ]
+    },
+    {
+      "id": "B-02",
+      "area": "transport",
+      "title": "Transport socket JSON-lines (TCP + Unix), tryb --no-http",
+      "status": "done",
+      "remaining": [],
+      "evidence": [
+        "src/linumert_headless/transport/socket.py",
+        "tests/test_socket.py"
+      ]
+    },
+    {
+      "id": "B-03",
+      "area": "tooling",
+      "title": "Roadmapa beta + tools/roadmap.py (list/next/done/render/check)",
+      "status": "done",
+      "remaining": [],
+      "evidence": [
+        "roadmap/plan.json",
+        "tools/roadmap.py",
+        "tests/test_roadmap.py"
+      ]
+    },
+    {
+      "id": "B-04",
+      "area": "docs",
+      "title": "AGENTS.md i mapa repo dla modeli o małym kontekście",
+      "status": "done",
+      "remaining": [],
+      "evidence": [
+        "AGENTS.md",
+        "docs/PLUGINS.md",
+        "docs/SOCKET.md"
+      ]
+    },
+    {
+      "id": "B-05",
+      "area": "core",
+      "title": "Rdzeń jako pakiet bez GUI: wydzielenie funkcji domen do wtyczek (kolejne domeny)",
+      "status": "planned",
+      "remaining": [
+        "Przenosić po jednej domenie (np. sim, plant) do wtyczek, gdy rdzeń pozostaje stabilny"
+      ],
+      "evidence": []
+    },
+    {
+      "id": "001",
+      "area": "M0",
+      "title": "Szkielet repozytorium, CI i licencja",
+      "status": "partial",
+      "remaining": [
+        "Zweryfikować w beta: kod przejęty z linumeRT jako ukończony; wskazać test beta jako dowód (tools/roadmap.py done)"
+      ],
+      "evidence": [],
+      "origin": {
+        "repo": "anonimov94/linumeRT",
+        "status": "done",
+        "verified_in_beta": false
+      }
+    },
+    {
+      "id": "002",
+      "area": "M0",
+      "title": "Wytyczne IP i rejestr pochodzenia",
+      "status": "partial",
+      "remaining": [
+        "Zweryfikować w beta: kod przejęty z linumeRT jako ukończony; wskazać test beta jako dowód (tools/roadmap.py done)"
+      ],
+      "evidence": [],
+      "origin": {
+        "repo": "anonimov94/linumeRT",
+        "status": "done",
+        "verified_in_beta": false
+      }
+    },
+    {
+      "id": "003",
+      "area": "M0",
+      "title": "Spike: LinuxCNC 2.9 w środowisku agenta",
+      "status": "partial",
+      "remaining": [
+        "Zweryfikować w beta: kod przejęty z linumeRT jako ukończony; wskazać test beta jako dowód (tools/roadmap.py done)"
+      ],
+      "evidence": [],
+      "origin": {
+        "repo": "anonimov94/linumeRT",
+        "status": "done",
+        "verified_in_beta": false
+      }
+    },
+    {
+      "id": "004",
+      "area": "M0",
+      "title": "Konfiguracja sim 3 osie z QtDragon",
+      "status": "partial",
+      "remaining": [
+        "Zweryfikować w beta: kod przejęty z linumeRT jako ukończony; wskazać test beta jako dowód (tools/roadmap.py done)"
+      ],
+      "evidence": [],
+      "origin": {
+        "repo": "anonimov94/linumeRT",
+        "status": "done",
+        "verified_in_beta": false
+      }
+    },
+    {
+      "id": "005",
+      "area": "M0",
+      "title": "Kopia bazowa ekranu QtDragon",
+      "status": "partial",
+      "remaining": [
+        "Zweryfikować w beta: kod przejęty z linumeRT jako ukończony; wskazać test beta jako dowód (tools/roadmap.py done)"
+      ],
+      "evidence": [],
+      "origin": {
+        "repo": "anonimov94/linumeRT",
+        "status": "done",
+        "verified_in_beta": false
+      }
+    },
+    {
+      "id": "006",
+      "area": "M0",
+      "title": "Rdzeń: model stanu maszyny i atrapa",
+      "status": "partial",
+      "remaining": [
+        "Zweryfikować w beta: kod przejęty z linumeRT jako ukończony; wskazać test beta jako dowód (tools/roadmap.py done)"
+      ],
+      "evidence": [],
+      "origin": {
+        "repo": "anonimov94/linumeRT",
+        "status": "done",
+        "verified_in_beta": false
+      }
+    },
+    {
+      "id": "007",
+      "area": "M0",
+      "title": "Katalog alarmów i tłumaczenia",
+      "status": "partial",
+      "remaining": [
+        "Zweryfikować w beta: kod przejęty z linumeRT jako ukończony; wskazać test beta jako dowód (tools/roadmap.py done)"
+      ],
+      "evidence": [],
+      "origin": {
+        "repo": "anonimov94/linumeRT",
+        "status": "done",
+        "verified_in_beta": false
+      }
+    },
+    {
+      "id": "008",
+      "area": "M0",
+      "title": "Bufor i bramka G0",
+      "status": "partial",
+      "remaining": [
+        "Zweryfikować w beta: kod przejęty z linumeRT jako ukończony; wskazać test beta jako dowód (tools/roadmap.py done)"
+      ],
+      "evidence": [],
+      "origin": {
+        "repo": "anonimov94/linumeRT",
+        "status": "done",
+        "verified_in_beta": false
+      }
+    },
+    {
+      "id": "009",
+      "area": "M1",
+      "title": "Specyfikacja wirtualnej maszyny Plant",
+      "status": "partial",
+      "remaining": [
+        "Zweryfikować w beta: kod przejęty z linumeRT jako ukończony; wskazać test beta jako dowód (tools/roadmap.py done)"
+      ],
+      "evidence": [],
+      "origin": {
+        "repo": "anonimov94/linumeRT",
+        "status": "done",
+        "verified_in_beta": false
+      }
+    },
+    {
+      "id": "010",
+      "area": "M1",
+      "title": "Model obrabiarki machine.yaml (jedno źródło prawdy)",
+      "status": "partial",
+      "remaining": [
+        "Zweryfikować w beta: kod przejęty z linumeRT jako ukończony; wskazać test beta jako dowód (tools/roadmap.py done)"
+      ],
+      "evidence": [],
+      "origin": {
+        "repo": "anonimov94/linumeRT",
+        "status": "done",
+        "verified_in_beta": false
+      }
+    },
+    {
+      "id": "011",
+      "area": "M1",
+      "title": "Plant: rdzeń dynamiki osi (C)",
+      "status": "partial",
+      "remaining": [
+        "Zweryfikować w beta: kod przejęty z linumeRT jako ukończony; wskazać test beta jako dowód (tools/roadmap.py done)"
+      ],
+      "evidence": [],
+      "origin": {
+        "repo": "anonimov94/linumeRT",
+        "status": "done",
+        "verified_in_beta": false
+      }
+    },
+    {
+      "id": "012",
+      "area": "M1",
+      "title": "Plant: emulacja napędów CiA 402 i krokowców",
+      "status": "partial",
+      "remaining": [
+        "Zweryfikować w beta: kod przejęty z linumeRT jako ukończony; wskazać test beta jako dowód (tools/roadmap.py done)"
+      ],
+      "evidence": [],
+      "origin": {
+        "repo": "anonimov94/linumeRT",
+        "status": "done",
+        "verified_in_beta": false
+      }
+    },
+    {
+      "id": "013",
+      "area": "M1",
+      "title": "Biblioteka napędów wirtualnych: szablony, kopiowanie, parametryzacja",
+      "status": "partial",
+      "remaining": [
+        "Zweryfikować w beta: kod przejęty z linumeRT jako ukończony; wskazać test beta jako dowód (tools/roadmap.py done)"
+      ],
+      "evidence": [],
+      "origin": {
+        "repo": "anonimov94/linumeRT",
+        "status": "done",
+        "verified_in_beta": false
+      }
+    },
+    {
+      "id": "014",
+      "area": "M1",
+      "title": "Plant: łańcuch kinematyczny, przejazdy, zderzaki, krańcówki, I/O",
+      "status": "partial",
+      "remaining": [
+        "Zweryfikować w beta: kod przejęty z linumeRT jako ukończony; wskazać test beta jako dowód (tools/roadmap.py done)"
+      ],
+      "evidence": [],
+      "origin": {
+        "repo": "anonimov94/linumeRT",
+        "status": "done",
+        "verified_in_beta": false
+      }
+    },
+    {
+      "id": "015",
+      "area": "M1",
+      "title": "Bazowanie po rozruchu: krańcówka, indeks, twardy zderzak, absolut, napęd",
+      "status": "partial",
+      "remaining": [
+        "Zweryfikować w beta: kod przejęty z linumeRT jako ukończony; wskazać test beta jako dowód (tools/roadmap.py done)"
+      ],
+      "evidence": [],
+      "origin": {
+        "repo": "anonimov94/linumeRT",
+        "status": "done",
+        "verified_in_beta": false
+      }
+    },
+    {
+      "id": "016",
+      "area": "M1",
+      "title": "Plant: serwer LRT-NET",
+      "status": "partial",
+      "remaining": [
+        "Zweryfikować w beta: kod przejęty z linumeRT jako ukończony; wskazać test beta jako dowód (tools/roadmap.py done)"
+      ],
+      "evidence": [],
+      "origin": {
+        "repo": "anonimov94/linumeRT",
+        "status": "done",
+        "verified_in_beta": false
+      }
+    },
+    {
+      "id": "017",
+      "area": "M1",
+      "title": "Komponent HAL lrt_net",
+      "status": "partial",
+      "remaining": [
+        "Zweryfikować w beta: kod przejęty z linumeRT jako ukończony; wskazać test beta jako dowód (tools/roadmap.py done)"
+      ],
+      "evidence": [],
+      "origin": {
+        "repo": "anonimov94/linumeRT",
+        "status": "done",
+        "verified_in_beta": false
+      }
+    },
+    {
+      "id": "018",
+      "area": "M1",
+      "title": "Konfiguracja LinuxCNC dla Plant (3 osie)",
+      "status": "partial",
+      "remaining": [
+        "Zweryfikować w beta: kod przejęty z linumeRT jako ukończony; wskazać test beta jako dowód (tools/roadmap.py done)"
+      ],
+      "evidence": [],
+      "origin": {
+        "repo": "anonimov94/linumeRT",
+        "status": "done",
+        "verified_in_beta": false
+      }
+    },
+    {
+      "id": "019",
+      "area": "M1",
+      "title": "Ograniczenia programowe, strefy zakazane i wyrocznia testowa",
+      "status": "partial",
+      "remaining": [
+        "Zweryfikować w beta: kod przejęty z linumeRT jako ukończony; wskazać test beta jako dowód (tools/roadmap.py done)"
+      ],
+      "evidence": [],
+      "origin": {
+        "repo": "anonimov94/linumeRT",
+        "status": "done",
+        "verified_in_beta": false
+      }
+    },
+    {
+      "id": "020",
+      "area": "M1",
+      "title": "Magazyn narzędzi, pozycje wymiany i kolizje w Plant",
+      "status": "partial",
+      "remaining": [
+        "Zweryfikować w beta: kod przejęty z linumeRT jako ukończony; wskazać test beta jako dowód (tools/roadmap.py done)"
+      ],
+      "evidence": [],
+      "origin": {
+        "repo": "anonimov94/linumeRT",
+        "status": "done",
+        "verified_in_beta": false
+      }
+    },
+    {
+      "id": "021",
+      "area": "M1",
+      "title": "Plant: wrzeciono VFD przez Modbus",
+      "status": "partial",
+      "remaining": [
+        "Zweryfikować w beta: kod przejęty z linumeRT jako ukończony; wskazać test beta jako dowód (tools/roadmap.py done)"
+      ],
+      "evidence": [],
+      "origin": {
+        "repo": "anonimov94/linumeRT",
+        "status": "done",
+        "verified_in_beta": false
+      }
+    },
+    {
+      "id": "022",
+      "area": "M1",
+      "title": "Plant: panel sterowania i pulpit MPG",
+      "status": "partial",
+      "remaining": [
+        "Zweryfikować w beta: kod przejęty z linumeRT jako ukończony; wskazać test beta jako dowód (tools/roadmap.py done)"
+      ],
+      "evidence": [],
+      "origin": {
+        "repo": "anonimov94/linumeRT",
+        "status": "done",
+        "verified_in_beta": false
+      }
+    },
+    {
+      "id": "023",
+      "area": "M1",
+      "title": "Edytor wirtualnej obrabiarki w panelu Plant",
+      "status": "partial",
+      "remaining": [
+        "Zweryfikować w beta: kod przejęty z linumeRT jako ukończony; wskazać test beta jako dowód (tools/roadmap.py done)"
+      ],
+      "evidence": [],
+      "origin": {
+        "repo": "anonimov94/linumeRT",
+        "status": "done",
+        "verified_in_beta": false
+      }
+    },
+    {
+      "id": "024",
+      "area": "M1",
+      "title": "Plant: scenariusze i raport prototypu",
+      "status": "partial",
+      "remaining": [
+        "Zweryfikować w beta: kod przejęty z linumeRT jako ukończony; wskazać test beta jako dowód (tools/roadmap.py done)"
+      ],
+      "evidence": [],
+      "origin": {
+        "repo": "anonimov94/linumeRT",
+        "status": "done",
+        "verified_in_beta": false
+      }
+    },
+    {
+      "id": "025",
+      "area": "M1",
+      "title": "Skrypty maszyn wirtualnych (VirtualBox)",
+      "status": "partial",
+      "remaining": [
+        "Zweryfikować w beta: kod przejęty z linumeRT jako ukończony; wskazać test beta jako dowód (tools/roadmap.py done)"
+      ],
+      "evidence": [],
+      "origin": {
+        "repo": "anonimov94/linumeRT",
+        "status": "done",
+        "verified_in_beta": false
+      }
+    },
+    {
+      "id": "026",
+      "area": "M1",
+      "title": "Bufor i bramka G1 (prototyp P0)",
+      "status": "partial",
+      "remaining": [
+        "Zweryfikować w beta: kod przejęty z linumeRT jako ukończony; wskazać test beta jako dowód (tools/roadmap.py done)"
+      ],
+      "evidence": [],
+      "origin": {
+        "repo": "anonimov94/linumeRT",
+        "status": "done",
+        "verified_in_beta": false
+      }
+    },
+    {
+      "id": "027",
+      "area": "M2",
+      "title": "Własny system projektowy ekranu",
+      "status": "partial",
+      "remaining": [
+        "Zweryfikować w beta: kod przejęty z linumeRT jako ukończony; wskazać test beta jako dowód (tools/roadmap.py done)"
+      ],
+      "evidence": [],
+      "origin": {
+        "repo": "anonimov94/linumeRT",
+        "status": "done",
+        "verified_in_beta": false
+      }
+    },
+    {
+      "id": "028",
+      "area": "gui_later",
+      "title": "Kompozycja ekranu głównego",
+      "status": "gui_later",
+      "remaining": [
+        "Pełny odbiór kompozycji i nowych skórek; HMI-02, SKIN-04…06.",
+        "Responsywny układ kart Start/formularzy Narzędzia oraz wizualny i klawiaturowy odbiór kluczowych podstron 1280×768; środowisko QtVCP i obecność własnych stron odebrane osobno."
+      ],
+      "evidence": [],
+      "origin": {
+        "repo": "anonimov94/linumeRT",
+        "status": "partial",
+        "verified_in_beta": false
+      }
+    },
+    {
+      "id": "029",
+      "area": "gui_later",
+      "title": "Tryby, JOG i pulpit MPG",
+      "status": "gui_later",
+      "remaining": [
+        "Rozliczyć MPG i pełny scenariusz odbioru 029."
+      ],
+      "evidence": [],
+      "origin": {
+        "repo": "anonimov94/linumeRT",
+        "status": "partial",
+        "verified_in_beta": false
+      }
+    },
+    {
+      "id": "030",
+      "area": "gui_later",
+      "title": "MDI i klawiatura ekranowa",
+      "status": "gui_later",
+      "remaining": [
+        "Potwierdzić cały zakres oryginalnego promptu na docelowym pulpicie."
+      ],
+      "evidence": [],
+      "origin": {
+        "repo": "anonimov94/linumeRT",
+        "status": "partial",
+        "verified_in_beta": false
+      }
+    },
+    {
+      "id": "031",
+      "area": "M2",
+      "title": "AUTO i wznowienie od linii",
+      "status": "partial",
+      "remaining": [
+        "D38-B: odzyskiwanie po Abort/E-STOP lub wymianie narzędzia i wykonanie helisy/łuku z zakładką; pełny odbiór run-from-line."
+      ],
+      "evidence": [],
+      "origin": {
+        "repo": "anonimov94/linumeRT",
+        "status": "partial",
+        "verified_in_beta": false
+      }
+    },
+    {
+      "id": "032",
+      "area": "M2",
+      "title": "Baza narzędzi z typami",
+      "status": "partial",
+      "remaining": [
+        "Zweryfikować w beta: kod przejęty z linumeRT jako ukończony; wskazać test beta jako dowód (tools/roadmap.py done)"
+      ],
+      "evidence": [],
+      "origin": {
+        "repo": "anonimov94/linumeRT",
+        "status": "done",
+        "verified_in_beta": false
+      }
+    },
+    {
+      "id": "033",
+      "area": "M2",
+      "title": "Zerowanie detalu i sonda",
+      "status": "partial",
+      "remaining": [
+        "Scenariusze Plant probe_z_touchplate i probe_corner (plant/scenarios) oraz sonda płytkowa (probe.type plate) — nie istnieją.",
+        "Logika sondy QtDragon (Basic/Versa) w nowym stylu i klik przez GUI na pulpicie; ręczny odbiór G54–G59.3 w HMI.",
+        "Ekran kalibracji sondy w HMI (D36) i wykorzystanie poprawki w cyklach sondowania; kalibracja na sprzęcie."
+      ],
+      "evidence": [],
+      "origin": {
+        "repo": "anonimov94/linumeRT",
+        "status": "partial",
+        "verified_in_beta": false
+      }
+    },
+    {
+      "id": "034",
+      "area": "M2",
+      "title": "Ręczna zmiana narzędzia",
+      "status": "partial",
+      "remaining": [
+        "Rozliczyć dialog ToolDB, anulowanie W-2130 i opcjonalne wycofanie Z."
+      ],
+      "evidence": [],
+      "origin": {
+        "repo": "anonimov94/linumeRT",
+        "status": "partial",
+        "verified_in_beta": false
+      }
+    },
+    {
+      "id": "035",
+      "area": "M2",
+      "title": "Alarmy na ekranie",
+      "status": "partial",
+      "remaining": [
+        "Pełne mapowanie kodów napędów/VFD i scenariusze alarmów z promptu."
+      ],
+      "evidence": [],
+      "origin": {
+        "repo": "anonimov94/linumeRT",
+        "status": "partial",
+        "verified_in_beta": false
+      }
+    },
+    {
+      "id": "036",
+      "area": "M2",
+      "title": "Poziomy dostępu",
+      "status": "partial",
+      "remaining": [
+        "Zweryfikować w beta: kod przejęty z linumeRT jako ukończony; wskazać test beta jako dowód (tools/roadmap.py done)"
+      ],
+      "evidence": [],
+      "origin": {
+        "repo": "anonimov94/linumeRT",
+        "status": "done",
+        "verified_in_beta": false
+      }
+    },
+    {
+      "id": "037",
+      "area": "gui_later",
+      "title": "Język polski i angielski",
+      "status": "gui_later",
+      "remaining": [
+        "Pełne tłumaczenie produkcyjnego HMI .ts/.qm, przełącznik i formaty jednostek; dług 007."
+      ],
+      "evidence": [],
+      "origin": {
+        "repo": "anonimov94/linumeRT",
+        "status": "partial",
+        "verified_in_beta": false
+      }
+    },
+    {
+      "id": "039",
+      "area": "M3",
+      "title": "Format .lnx i BaseMacroGenerator",
+      "status": "partial",
+      "remaining": [
+        "Zweryfikować w beta: kod przejęty z linumeRT jako ukończony; wskazać test beta jako dowód (tools/roadmap.py done)"
+      ],
+      "evidence": [],
+      "origin": {
+        "repo": "anonimov94/linumeRT",
+        "status": "done",
+        "verified_in_beta": false
+      }
+    },
+    {
+      "id": "040",
+      "area": "M3",
+      "title": "Generatory: nagłówek, koniec, narzędzie, planowanie",
+      "status": "partial",
+      "remaining": [
+        "Zweryfikować w beta: kod przejęty z linumeRT jako ukończony; wskazać test beta jako dowód (tools/roadmap.py done)"
+      ],
+      "evidence": [],
+      "origin": {
+        "repo": "anonimov94/linumeRT",
+        "status": "done",
+        "verified_in_beta": false
+      }
+    },
+    {
+      "id": "041",
+      "area": "M3",
+      "title": "Generatory: kieszenie",
+      "status": "partial",
+      "remaining": [
+        "Zweryfikować w beta: kod przejęty z linumeRT jako ukończony; wskazać test beta jako dowód (tools/roadmap.py done)"
+      ],
+      "evidence": [],
+      "origin": {
+        "repo": "anonimov94/linumeRT",
+        "status": "done",
+        "verified_in_beta": false
+      }
+    },
+    {
+      "id": "042",
+      "area": "M3",
+      "title": "Generatory: wiercenie i gwintowanie",
+      "status": "partial",
+      "remaining": [
+        "Odbiór wszystkich wzorów, cykli, walidacji i podglądu przez GUI."
+      ],
+      "evidence": [],
+      "origin": {
+        "repo": "anonimov94/linumeRT",
+        "status": "partial",
+        "verified_in_beta": false
+      }
+    },
+    {
+      "id": "043",
+      "area": "M3",
+      "title": "Generatory: rowki, czopy, kontur",
+      "status": "partial",
+      "remaining": [
+        "Zweryfikować w beta: kod przejęty z linumeRT jako ukończony; wskazać test beta jako dowód (tools/roadmap.py done)"
+      ],
+      "evidence": [],
+      "origin": {
+        "repo": "anonimov94/linumeRT",
+        "status": "done",
+        "verified_in_beta": false
+      }
+    },
+    {
+      "id": "044",
+      "area": "M3",
+      "title": "Lekser G-code i walidacja w edytorze",
+      "status": "partial",
+      "remaining": [
+        "Zweryfikować w beta: kod przejęty z linumeRT jako ukończony; wskazać test beta jako dowód (tools/roadmap.py done)"
+      ],
+      "evidence": [],
+      "origin": {
+        "repo": "anonimov94/linumeRT",
+        "status": "done",
+        "verified_in_beta": false
+      }
+    },
+    {
+      "id": "045",
+      "area": "M3",
+      "title": "Panel programu dialogowego",
+      "status": "partial",
+      "remaining": [
+        "Komplet operacji kroków, walidacja przy polach i kryteria oryginalnego promptu."
+      ],
+      "evidence": [],
+      "origin": {
+        "repo": "anonimov94/linumeRT",
+        "status": "partial",
+        "verified_in_beta": false
+      }
+    },
+    {
+      "id": "046",
+      "area": "M3",
+      "title": "Podglądy 2D w formularzach",
+      "status": "partial",
+      "remaining": [
+        "Wszystkie prymitywy, wymiary i preview_2d wszystkich generatorów."
+      ],
+      "evidence": [],
+      "origin": {
+        "repo": "anonimov94/linumeRT",
+        "status": "partial",
+        "verified_in_beta": false
+      }
+    },
+    {
+      "id": "047",
+      "area": "M3",
+      "title": "Menedżer programów i pliki .lnx",
+      "status": "partial",
+      "remaining": [
+        "Pełny menedżer, szablony i odbiór bezpiecznych operacji plikowych."
+      ],
+      "evidence": [],
+      "origin": {
+        "repo": "anonimov94/linumeRT",
+        "status": "partial",
+        "verified_in_beta": false
+      }
+    },
+    {
+      "id": "048",
+      "area": "M3",
+      "title": "Biblioteka podprogramów o-word",
+      "status": "partial",
+      "remaining": [
+        "Zweryfikować w beta: kod przejęty z linumeRT jako ukończony; wskazać test beta jako dowód (tools/roadmap.py done)"
+      ],
+      "evidence": [],
+      "origin": {
+        "repo": "anonimov94/linumeRT",
+        "status": "done",
+        "verified_in_beta": false
+      }
+    },
+    {
+      "id": "049",
+      "area": "M3",
+      "title": "Test technologiczny na Plant",
+      "status": "partial",
+      "remaining": [
+        "Zweryfikować w beta: kod przejęty z linumeRT jako ukończony; wskazać test beta jako dowód (tools/roadmap.py done)"
+      ],
+      "evidence": [],
+      "origin": {
+        "repo": "anonimov94/linumeRT",
+        "status": "done",
+        "verified_in_beta": false
+      }
+    },
+    {
+      "id": "051",
+      "area": "M4",
+      "title": "Ścieżka z programu",
+      "status": "partial",
+      "remaining": [
+        "Zweryfikować w beta: kod przejęty z linumeRT jako ukończony; wskazać test beta jako dowód (tools/roadmap.py done)"
+      ],
+      "evidence": [],
+      "origin": {
+        "repo": "anonimov94/linumeRT",
+        "status": "done",
+        "verified_in_beta": false
+      }
+    },
+    {
+      "id": "052",
+      "area": "M4",
+      "title": "Proces symulacji",
+      "status": "partial",
+      "remaining": [
+        "Zweryfikować w beta: kod przejęty z linumeRT jako ukończony; wskazać test beta jako dowód (tools/roadmap.py done)"
+      ],
+      "evidence": [],
+      "origin": {
+        "repo": "anonimov94/linumeRT",
+        "status": "done",
+        "verified_in_beta": false
+      }
+    },
+    {
+      "id": "053",
+      "area": "M4",
+      "title": "Czas obróbki i porównanie z Plant",
+      "status": "partial",
+      "remaining": [
+        "Pełny wynik per narzędzie/krok i odbiór zakresu modelu; wyniki nie są ogólną gwarancją ±10%."
+      ],
+      "evidence": [],
+      "origin": {
+        "repo": "anonimov94/linumeRT",
+        "status": "partial",
+        "verified_in_beta": false
+      }
+    },
+    {
+      "id": "054",
+      "area": "M4",
+      "title": "Przygotówka",
+      "status": "partial",
+      "remaining": [
+        "Zweryfikować w beta: kod przejęty z linumeRT jako ukończony; wskazać test beta jako dowód (tools/roadmap.py done)"
+      ],
+      "evidence": [],
+      "origin": {
+        "repo": "anonimov94/linumeRT",
+        "status": "done",
+        "verified_in_beta": false
+      }
+    },
+    {
+      "id": "055",
+      "area": "M4",
+      "title": "Materiał 2.5D",
+      "status": "partial",
+      "remaining": [
+        "Pełny odbiór dokładności objętości ±2% i wydajności."
+      ],
+      "evidence": [],
+      "origin": {
+        "repo": "anonimov94/linumeRT",
+        "status": "partial",
+        "verified_in_beta": false
+      }
+    },
+    {
+      "id": "056",
+      "area": "M4",
+      "title": "Reguły kolizji lite",
+      "status": "partial",
+      "remaining": [
+        "Pełna macierz reguł i tryb offline; nie przywracać komend E-STOP z symulacji."
+      ],
+      "evidence": [],
+      "origin": {
+        "repo": "anonimov94/linumeRT",
+        "status": "partial",
+        "verified_in_beta": false
+      }
+    },
+    {
+      "id": "057",
+      "area": "gui_later",
+      "title": "Widok 3D symulacji",
+      "status": "gui_later",
+      "remaining": [
+        "Interaktywna oś czasu/skok do linii i benchmark 100 000 segmentów; SKIN-01/06."
+      ],
+      "evidence": [],
+      "origin": {
+        "repo": "anonimov94/linumeRT",
+        "status": "partial",
+        "verified_in_beta": false
+      }
+    },
+    {
+      "id": "058",
+      "area": "M4",
+      "title": "Typy narzędzi w symulacji",
+      "status": "partial",
+      "remaining": [
+        "Pełne profile i K-303, obwiednia STL oraz odbiór stemplowania."
+      ],
+      "evidence": [],
+      "origin": {
+        "repo": "anonimov94/linumeRT",
+        "status": "partial",
+        "verified_in_beta": false
+      }
+    },
+    {
+      "id": "059",
+      "area": "M4",
+      "title": "Raport symulacji i eksport STL",
+      "status": "partial",
+      "remaining": [
+        "Spójna droga offline „Symuluj” z panelu dialogowego i plików."
+      ],
+      "evidence": [],
+      "origin": {
+        "repo": "anonimov94/linumeRT",
+        "status": "partial",
+        "verified_in_beta": false
+      }
+    },
+    {
+      "id": "061",
+      "area": "M5",
+      "title": "machine.yaml: napędy i wejścia rzeczywiste",
+      "status": "partial",
+      "remaining": [
+        "Pulpit (MPG, przyciski) i E-STOP rzeczywisty w sekcji hardware.",
+        "Raport konkursu 03."
+      ],
+      "evidence": [],
+      "origin": {
+        "repo": "anonimov94/linumeRT",
+        "status": "partial",
+        "verified_in_beta": false
+      }
+    },
+    {
+      "id": "062",
+      "area": "M5",
+      "title": "Generator INI/HAL: sim, Plant, step/dir",
+      "status": "partial",
+      "remaining": [
+        "Nazwy pinów Mesa i całe wyjście hardware: NIEZWERYFIKOWANE NA SPRZĘCIE.",
+        "EtherCAT (063), wrzeciono PWM/mb2hal (064)."
+      ],
+      "evidence": [],
+      "origin": {
+        "repo": "anonimov94/linumeRT",
+        "status": "partial",
+        "verified_in_beta": false
+      }
+    },
+    {
+      "id": "063",
+      "area": "M5",
+      "title": "Generator EtherCAT (lcec, CiA 402)",
+      "status": "planned",
+      "remaining": [],
+      "evidence": [],
+      "origin": {
+        "repo": "anonimov94/linumeRT",
+        "status": "planned",
+        "verified_in_beta": false
+      }
+    },
+    {
+      "id": "064",
+      "area": "M5",
+      "title": "Wrzeciono RS485 w generatorze",
+      "status": "planned",
+      "remaining": [],
+      "evidence": [],
+      "origin": {
+        "repo": "anonimov94/linumeRT",
+        "status": "planned",
+        "verified_in_beta": false
+      }
+    },
+    {
+      "id": "065",
+      "area": "M5",
+      "title": "Kinematyki 4 i 5 osi",
+      "status": "partial",
+      "remaining": [
+        "Pełna fizyka osi obrotowych, generator kinematyk, DRO/TCP i five_axis_demo."
+      ],
+      "evidence": [],
+      "origin": {
+        "repo": "anonimov94/linumeRT",
+        "status": "partial",
+        "verified_in_beta": false
+      }
+    },
+    {
+      "id": "066",
+      "area": "M5",
+      "title": "Automatyczna zmiana narzędzia",
+      "status": "partial",
+      "remaining": [
+        "Podpięcie makra do INI sim/Plant i generatora konfiguracji, widok magazynu, scenariusze ATC, walidacja stref wymiany, karuzela i parasol, dziennik transakcyjny i RECOVERY_REQUIRED po E-STOP."
+      ],
+      "evidence": [],
+      "origin": {
+        "repo": "anonimov94/linumeRT",
+        "status": "partial",
+        "verified_in_beta": false
+      }
+    },
+    {
+      "id": "067",
+      "area": "M5",
+      "title": "Kreator konfiguracji maszyny",
+      "status": "planned",
+      "remaining": [],
+      "evidence": [],
+      "origin": {
+        "repo": "anonimov94/linumeRT",
+        "status": "planned",
+        "verified_in_beta": false
+      }
+    },
+    {
+      "id": "068",
+      "area": "M5",
+      "title": "Test latencji i raport kwalifikacji",
+      "status": "planned",
+      "remaining": [],
+      "evidence": [],
+      "origin": {
+        "repo": "anonimov94/linumeRT",
+        "status": "planned",
+        "verified_in_beta": false
+      }
+    },
+    {
+      "id": "069",
+      "area": "M5",
+      "title": "Diagnostyka napędów",
+      "status": "partial",
+      "remaining": [
+        "Dekoder CiA402, wykresy napędów, ethercat slaves/master i test fault."
+      ],
+      "evidence": [],
+      "origin": {
+        "repo": "anonimov94/linumeRT",
+        "status": "partial",
+        "verified_in_beta": false
+      }
+    },
+    {
+      "id": "070",
+      "area": "M5",
+      "title": "Łańcuch E-STOP i bezpieczeństwo",
+      "status": "partial",
+      "remaining": [
+        "Pełny generator i odbiór toru sprzętowego oraz niezależnego nadzoru PC; bez osłabiania kontraktu safety."
+      ],
+      "evidence": [],
+      "origin": {
+        "repo": "anonimov94/linumeRT",
+        "status": "partial",
+        "verified_in_beta": false
+      }
+    },
+    {
+      "id": "071",
+      "area": "M5",
+      "title": "Asystent strojenia na Plant",
+      "status": "planned",
+      "remaining": [],
+      "evidence": [],
+      "origin": {
+        "repo": "anonimov94/linumeRT",
+        "status": "planned",
+        "verified_in_beta": false
+      }
+    },
+    {
+      "id": "073",
+      "area": "M6",
+      "title": "Wtyczki deklaratywne: format i silnik",
+      "status": "planned",
+      "remaining": [],
+      "evidence": [],
+      "origin": {
+        "repo": "anonimov94/linumeRT",
+        "status": "planned",
+        "verified_in_beta": false
+      }
+    },
+    {
+      "id": "074",
+      "area": "M6",
+      "title": "Menedżer wtyczek",
+      "status": "planned",
+      "remaining": [],
+      "evidence": [],
+      "origin": {
+        "repo": "anonimov94/linumeRT",
+        "status": "planned",
+        "verified_in_beta": false
+      }
+    },
+    {
+      "id": "075",
+      "area": "M6",
+      "title": "Panel cykli i skryptów",
+      "status": "planned",
+      "remaining": [],
+      "evidence": [],
+      "origin": {
+        "repo": "anonimov94/linumeRT",
+        "status": "planned",
+        "verified_in_beta": false
+      }
+    },
+    {
+      "id": "076",
+      "area": "M6",
+      "title": "Repozytorium społeczności i przykłady",
+      "status": "planned",
+      "remaining": [],
+      "evidence": [],
+      "origin": {
+        "repo": "anonimov94/linumeRT",
+        "status": "planned",
+        "verified_in_beta": false
+      }
+    },
+    {
+      "id": "077",
+      "area": "M6",
+      "title": "Instalator dla Debiana 12 + LinuxCNC 2.9",
+      "status": "partial",
+      "remaining": [
+        "Instalator /opt, update/rollback/uninstall, idempotencja, odbiór live USB/instalacji i latencji."
+      ],
+      "evidence": [],
+      "origin": {
+        "repo": "anonimov94/linumeRT",
+        "status": "partial",
+        "verified_in_beta": false
+      }
+    },
+    {
+      "id": "078",
+      "area": "M6",
+      "title": "Pierwsze uruchomienie i linumert doctor",
+      "status": "partial",
+      "remaining": [
+        "Wersje/działanie LinuxCNC/HAL, uprawnienia, Plant, latencja i kreator pierwszego uruchomienia."
+      ],
+      "evidence": [],
+      "origin": {
+        "repo": "anonimov94/linumeRT",
+        "status": "partial",
+        "verified_in_beta": false
+      }
+    },
+    {
+      "id": "079",
+      "area": "M6",
+      "title": "Dokumentacja użytkownika",
+      "status": "partial",
+      "remaining": [
+        "Komplet podręcznika dla zakresu 079; nie dokumentować planowanych funkcji jako działających."
+      ],
+      "evidence": [],
+      "origin": {
+        "repo": "anonimov94/linumeRT",
+        "status": "partial",
+        "verified_in_beta": false
+      }
+    },
+    {
+      "id": "080",
+      "area": "M6",
+      "title": "Przegląd IP przed wydaniem",
+      "status": "partial",
+      "remaining": [
+        "Pełny audyt przed wydaniem, przegląd podobieństwa i wyniki sprawdzenia nazwy."
+      ],
+      "evidence": [],
+      "origin": {
+        "repo": "anonimov94/linumeRT",
+        "status": "partial",
+        "verified_in_beta": false
+      }
+    },
+    {
+      "id": "081",
+      "area": "M6",
+      "title": "Twardnienie",
+      "status": "partial",
+      "remaining": [
+        "Pełny przegląd uprawnień/nasłuchu/limitów oraz pip-audit i raport."
+      ],
+      "evidence": [],
+      "origin": {
+        "repo": "anonimov94/linumeRT",
+        "status": "partial",
+        "verified_in_beta": false
+      }
+    },
+    {
+      "id": "082",
+      "area": "M6",
+      "title": "Pełna regresja na Plant",
+      "status": "partial",
+      "remaining": [
+        "suite_all 3× PASS i naprawa OD-01: zielona macierz mimo CRASH/COVER_CRASH."
+      ],
+      "evidence": [],
+      "origin": {
+        "repo": "anonimov94/linumeRT",
+        "status": "partial",
+        "verified_in_beta": false
+      }
+    },
+    {
+      "id": "083",
+      "area": "M6",
+      "title": "Wydanie v0.5.0-alpha",
+      "status": "planned",
+      "remaining": [],
+      "evidence": [],
+      "origin": {
+        "repo": "anonimov94/linumeRT",
+        "status": "planned",
+        "verified_in_beta": false
+      }
+    },
+    {
+      "id": "084",
+      "area": "M6",
+      "title": "Retrospektywa i kolejne półrocze",
+      "status": "planned",
+      "remaining": [],
+      "evidence": [],
+      "origin": {
+        "repo": "anonimov94/linumeRT",
+        "status": "planned",
+        "verified_in_beta": false
+      }
+    },
+    {
+      "id": "B-06",
+      "area": "docs",
+      "title": "LICENSE (GPL-2.0) i SAFETY.md (brak funkcji bezpieczeństwa, wyłączenie odpowiedzialności)",
+      "status": "done",
+      "remaining": [],
+      "evidence": [
+        "LICENSE",
+        "SAFETY.md"
+      ]
+    }
+  ]
+}

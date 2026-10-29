@@ -1,0 +1,16 @@
+{
+  "python": "3.14.8 (main, Oct  2 2026, 10:23:31) [GCC 16.2.1 20260810]",
+  "backend": "fake",
+  "host": "127.0.0.1",
+  "checks": [
+    "installed daemon and HTTP",
+    "86 operations exported",
+    "SDK login, role enforcement, power and homing",
+    "SDK topic selection",
+    "WebSocket negative increment and disconnect stop",
+    "SDK logout",
+    "SIGTERM exits within 5 seconds"
+  ],
+  "result": "PASS",
+  "hardware_verified": false
+}

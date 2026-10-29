@@ -1,0 +1,5 @@
+name: stats
+version: 0.1.0
+api: 1
+description: Statystyki programu G-code (liczba bloków, ruchy, zmiany narzędzia).
+domains: [stats]
