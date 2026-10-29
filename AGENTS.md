@@ -1,5 +1,12 @@
 # AGENTS.md — instrukcja dla modeli pracujących na linumeRT headless (beta)
 
+> **⛔ STOP — OBOWIĄZKOWY AUDYT CODEX / CLAUDE / KAŻDEGO AGENTA (2026-10-29)**
+>
+> **ZANIM rozpoczniesz nowe zadanie, wykonasz zmianę w kodzie, podejmiesz kolejny punkt roadmapy lub uznasz backend za gotowy — otwórz i przeczytaj CAŁY [CODEX_STOP_READ.md](CODEX_STOP_READ.md).**
+> Zgłoszono problem P0 mapowania osi/jointów oraz krytyczne zagadnienia P1: jednostki JOG, role/uprawnienia, wtyczki, watchdog HAL. Podaj właścicielowi zwięzłe potwierdzenie lektury, aktualne dowody i plan weryfikacji; rozróżniaj potwierdzone błędy od ryzyk.
+> **Wstrzymaj nowe funkcje / GUI / optymalizacje niezwiązane z audytem do decyzji właściciela.** W żadnym razie nie uznawaj testów fake/Plant za odbiór prawdziwego sprzętu. **Nie scalaj do main bez zgody.**
+>
+
 Czytaj TYLKO ten plik na start (≈2 min), potem tylko pliki ze swojego zadania.
 
 ## Zasady (obowiązują zawsze)
