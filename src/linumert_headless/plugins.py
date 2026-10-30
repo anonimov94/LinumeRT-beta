@@ -113,7 +113,7 @@ class PluginApi:
                  publish: Callable[[str, dict[str, Any]], Any], record: PluginRecord):
         self.name = manifest.name
         self.domains = manifest.domains
-        self.services = services      # tylko do odczytu z konwencji; własne dane: set_service
+        self.services = services      # pełny dostęp; konwencja nie stanowi izolacji (audyt A-05)
         self._contract = contract
         self._publish = publish
         self._record = record

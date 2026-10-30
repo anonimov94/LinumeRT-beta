@@ -2,7 +2,7 @@
 
 SPDX-License-Identifier: GPL-2.0-or-later
 
-Rdzeń jest stabilny; funkcje dokładasz jako wtyczki. Wtyczka = katalog z `plugin.yaml` + `plugin.py`.
+Rdzeń pozostaje eksperymentalny i podlega audytowi P0/P1; nowe funkcje są wstrzymane. Wtyczka = katalog z `plugin.yaml` + `plugin.py`.
 
 ```
 plugins/moja/
@@ -42,5 +42,7 @@ Zarządzanie: `plugin.list`, `plugin.info`, `plugin.enable`/`plugin.disable` (od
 ## Bezpieczeństwo i błędy
 Wtyczka to kod uruchamiany w procesie — instaluj tylko zaufane. Błąd wtyczki (import, manifest,
 `register`) nie przewraca aplikacji: status `failed` + opis w `plugin.list`, jej operacje są
-wycofywane. Wtyczka nie omija ról, limitera ani deadmana: wszystko idzie przez kontrakt.
-Operacje ruchowe wtyczki muszą mieć `safety="motion"` i wołać tylko usługę `machine`.
+wycofywane. `PluginApi.services` oraz `ctx.services` udostępniają usługi rdzenia, w tym
+`machine`. Bezpośrednie wywołania usług mogą ominąć kontrole kontraktu. Zalecenie używania
+kontraktu jest konwencją, a nie egzekwowaną izolacją. Python w tym samym procesie nie tworzy
+sandboxa. Ograniczenie API pozostaje zakresem A-05; obecny kod wymaga zaufania do wtyczek.

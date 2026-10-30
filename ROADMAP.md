@@ -2,7 +2,7 @@
 
 > Plik GENEROWANY z `roadmap/plan.json` przez `python3 tools/roadmap.py render`. Nie edytuj ręcznie.
 
-Aktualizacja: 2026-10-29 · planowane: 19 · częściowe: 64 · ukończone: 10 · GUI (na końcu): 5 · zablokowane: 1
+Aktualizacja: 2026-10-30 · planowane: 18 · częściowe: 65 · ukończone: 10 · GUI (na końcu): 5 · zablokowane: 1
 
 - Po ukończeniu funkcji: python3 tools/roadmap.py done ID --evidence ŚCIEŻKA [...]. Narzędzie samo przepisuje ROADMAP.md.
 - Wszystko dotyczące prawdziwego sprzętu: NIEZWERYFIKOWANE NA SPRZĘCIE.
@@ -11,7 +11,7 @@ Aktualizacja: 2026-10-29 · planowane: 19 · częściowe: 64 · ukończone: 10 �
 | ID | Obszar | Status | Zakres |
 |---|---|---|---|
 | A-00 | audit | ukończone | Audyt: plan działania P0/P1 zapisany w git (docs/PLAN_AUDYTU_P0_P1.md), wstrzymanie nowych funkcji do decyzji |
-| A-01 | audit | planowane | Audyt: uczciwość dokumentacji (fałszywe zdanie o wtyczkach, liczby generowane narzędziem) |
+| A-01 | audit | częściowe | Audyt: uczciwość dokumentacji (fałszywe zdanie o wtyczkach, liczby generowane narzędziem) |
 | A-02 | audit | zablokowane | Audyt P0: jawny model joint↔oś (gantry X/Y1/Y2/Z, osie obrotowe), bezpieczna odmowa |
 | A-03 | audit | planowane | Audyt P1: jednostki i poprawność JOG (liniowe mm, obrotowe stopnie, jednostki INI) |
 | A-04 | audit | planowane | Audyt P1: autoryzacja — bezpieczne domyślne dla backendu linuxcnc, rozdział odczyt/sterowanie/serwis |
@@ -113,8 +113,7 @@ Aktualizacja: 2026-10-29 · planowane: 19 · częściowe: 64 · ukończone: 10 �
 ## Pozostały zakres
 
 ### A-01 Audyt: uczciwość dokumentacji (fałszywe zdanie o wtyczkach, liczby generowane narzędziem)
-- Plan: docs/PLAN_AUDYTU_P0_P1.md §4 A-01
-- Czeka na decyzję właściciela D1/D2
+- Dokumentacja i generator wdrożone; make lint PASS, pełne testy przerwane limitem 60 s w test_native_sim.py::test_fuzzing_zgodny_z_pythonem; ponowna weryfikacja z dłuższym limitem
 
 ### A-02 Audyt P0: jawny model joint↔oś (gantry X/Y1/Y2/Z, osie obrotowe), bezpieczna odmowa
 - Część integracyjna wymaga LinuxCNC 2.9 SIM (decyzja D0)

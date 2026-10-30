@@ -20,7 +20,7 @@ nie przepisując ani jednej linijki logiki sterowania.
                 │  REST / WebSocket / SDK / CLI
 ┌───────────────▼─────────────────────────────────────────────┐
 │  linumert_headless  — warstwa usługi                        │
-│  kontrakt (86 operacji, 12 domen) · sesje · deadman jogu    │
+│  kontrakt operacji               · sesje · deadman jogu    │
 │  limiter · token · strażnik Host/Origin · magazyn stanu     │
 ├─────────────────────────────────────────────────────────────┤
 │  rdzeń: linumert · linumert_sim · linumert_plant            │
@@ -136,3 +136,5 @@ Zasady, których interfejs nie pozwala obejść — GUI dostaje je „za darmo�
 ## Licencja
 
 GPL-2.0-or-later — tak jak repozytorium nadrzędne.
+
+Aktualne liczby operacji i kolekcji testów: [generowany raport](docs/STAN.md).

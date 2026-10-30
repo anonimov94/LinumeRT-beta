@@ -74,4 +74,6 @@ python3 tools/roadmap.py check                             # spójność roadmap
 2. Napisz test (`tests/test_<temat>.py`), potem kod. Jedna funkcja = jeden mały przyrost.
 3. `make lint test` zielone → `roadmap.py done ID --evidence …` → koniec.
 Bezpieczeństwo (E-STOP, jog deadman, role) jest w rdzeniu i nie wolno go osłabiać wtyczką —
-wtyczka nie dostaje dostępu do backendu maszyny inaczej niż przez operacje kontraktu.
+Docelowo wtyczki powinny sterować przez kontrakt. Obecnie `PluginApi.services` i `ctx.services`
+udostępniają usługi rdzenia: ograniczenie jest konwencją, nie izolacją. Instaluj tylko zaufane
+wtyczki; usunięcie bezpośredniego dostępu pozostaje zakresem audytu A-05.

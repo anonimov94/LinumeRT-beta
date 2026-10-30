@@ -3,7 +3,7 @@
 SPDX-License-Identifier: GPL-2.0-or-later
 
 Ten dokument jest przepisem: co pobrać, co wygenerować, jak narysować przycisk i jak
-odebrać stan. Wszystkie liczby i nazwy są zweryfikowane na działającym kodzie.
+odebrać stan. Nazwy i liczby operacji pochodzą z kontraktu; ich zestawienie jest generowane w `docs/STAN.md`.
 
 **Zasada: GUI nie zna Pythona, LinuxCNC ani backendu.** Zna kontrakt JSON i cztery
 transporty. Zmiana backendu (atrapa → LinuxCNC → Plant) nie wymaga zmian w GUI.
@@ -35,10 +35,7 @@ Kontrakt to lista operacji. Każda ma:
 }
 ```
 
-**Stan: 86 operacji, 12 domen** — `access, alarm, cam, config, diag, machine, offset,
-plant, program, sim, system, tool`. **85 `implemented`, 0 `planned`**
-(ostatnie dwie: `machine.tool_change`, `offset.probe_run`). Rozkład `safety`: `none` 60, `motion` 12,
-`stop` 7, `config` 6.
+Aktualne liczby operacji, domen i statusów: [generowany raport](docs/STAN.md).
 
 ### Co z tym zrobić w GUI
 

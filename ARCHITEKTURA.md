@@ -42,10 +42,7 @@ logikę bez sprzętu.
 
 Invariant sprawdzany testem: `operation.domain == name.split(".")[0]`.
 
-**Stan zweryfikowany: 86 operacji, 12 domen** (`access, alarm, cam, config, diag,
-machine, offset, plant, program, sim, system, tool`); **85 `implemented`, 0 `planned`**
-(ostatnie dwie: `machine.tool_change`, `offset.probe_run`). Rozkład `safety`: `none` 60, `motion` 12,
-`stop` 7, `config` 6. Role: `operator`, `technolog`, `serwis`.
+Aktualne liczby operacji, domen i statusów: [generowany raport](docs/STAN.md).
 
 Dodanie funkcji = jedna rejestracja w kontrakcie + handler. REST, WebSocket, CLI i SDK
 dostają ją automatycznie (CLI i SDK są generowane z kontraktu w locie).
@@ -129,5 +126,5 @@ atrybut na współdzielonym hubie nadpisywałby się przy drugim kliencie GUI i 
 | `linumert_sim` (symulacja offline) | 2 771 |
 | **razem `src/`** | **26 437** |
 
-Testy: 65 plików, **899 przechodzi, 0 pominiętych, 77 podtestów** — bez LinuxCNC, bez Qt,
-bez serwera X.
+Liczba zebranych testów: [generowany raport](docs/STAN.md). Wyniki wykonania są
+osobnymi dowodami; kolekcja nie oznacza PASS ani odbioru LinuxCNC lub sprzętu.
