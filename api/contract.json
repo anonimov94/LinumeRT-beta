@@ -1611,7 +1611,7 @@
             "type": "string"
           },
           "speed": {
-            "description": "mm/s; 0 = zatrzymanie jogu tej osi",
+            "description": "mm/s dla osi liniowych, °/s dla A/B/C; znak = kierunek; 0 = STOP: backend LinuxCNC zatrzymuje cały ruch (ABORT)",
             "title": "Speed",
             "type": "number"
           },
@@ -1682,7 +1682,7 @@
             "type": "string"
           },
           "speed": {
-            "description": "mm/s; 0 = zatrzymanie jogu tej osi",
+            "description": "mm/s dla osi liniowych, °/s dla A/B/C; znak = kierunek; 0 = STOP: backend LinuxCNC zatrzymuje cały ruch (ABORT)",
             "title": "Speed",
             "type": "number"
           },
@@ -1693,7 +1693,7 @@
             "type": "string"
           },
           "distance": {
-            "description": "krok przyrostowy [mm]",
+            "description": "krok przyrostowy: mm (osie liniowe) lub stopnie (A/B/C); kierunek wynika ze znaku prędkości",
             "exclusiveMinimum": 0,
             "title": "Distance",
             "type": "number"

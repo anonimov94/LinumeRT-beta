@@ -36,7 +36,8 @@ def make_backend(result=1):
     module = SimpleNamespace(command=lambda: command, STATE_ESTOP=1, STATE_ESTOP_RESET=2,
                              RCS_ERROR=3, MODE_MANUAL=4, MODE_MDI=5, JOG_CONTINUOUS=6)
     reader = SimpleNamespace(read=lambda: SimpleNamespace(axis_names=("X", "Z")),
-                             axis_mapping=lambda: AxisMap(("X", "Z"), (0, 1), 11))
+                             axis_mapping=lambda: AxisMap(("X", "Z"), (0, 1), 11),
+                             machine_factor=lambda axis: 1.0)
     return LinuxCNCBackend(module=module, reader=reader), command
 
 

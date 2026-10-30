@@ -34,7 +34,7 @@ nie jest zgodą na merge do `main`, uruchomienie sprzętu ani automatyczny odbi�
 - Ograniczenia: obsługiwane tylko `trivkins`; gantry wymaga synchronizacji;
   zmiana mapowania INI podczas działania wymaga ponownego rozruchu aplikacji.
   **STOP JOG wysyła ABORT dla całego ruchu**, także dla pojedynczej osi/prędkości zero.
-  Opis `JogRequest.speed` w kontrakcie nadal mówi o zatrzymaniu osi — ujednolicić w A-03.
+  Opis `JogRequest.speed` w kontrakcie jest już ujednolicony (A-03); jednostki JOG: `docs/AUDYT_A02_SIM_2026_10_30.md`.
 - Dowody: [raport audytu](docs/AUDYT_A01_A02.md) i [log](docs/AUDYT_A01_A02_LOCAL.log).
   Lint PASS; pełny przebieg z limitem 300 s PASS; po końcowych poprawkach 75 testów PASS.
   Pełny przebieg rozpoczęto przed ostatnimi poprawkami; dokładny zakres jest w raporcie.
@@ -51,6 +51,8 @@ nie jest zgodą na merge do `main`, uruchomienie sprzętu ani automatyczny odbi�
    Zachować wersję LinuxCNC, konfigurację i SHA. **NIEZWERYFIKOWANE NA SPRZĘCIE.**
 3. **A-03 / jednostki JOG:** mm i mm/s kontra stopnie i stopnie/s, konwersja jednostek
    INI, G20/G21, continuous/incremental, deadman/STOP i zgodny opis kontraktu.
+   **Zrobione na SIM (2026-10-30):** jednostki mm/° dla JOG i migawki, opis kontraktu; otwarte:
+   G20/G21 w programie, deadman a ABORT. Raport: `docs/AUDYT_A02_SIM_2026_10_30.md`.
 4. **A-04 / role:** bezpieczne domyślne ustawienia LinuxCNC, brak PIN/sekretu,
    wszystkie transporty, restart i wygaśnięcie sesji; ustalić inicjalizację poświadczeń D3.
 5. **A-05 / wtyczki:** decyzja D4 o zaufanych wtyczkach z ograniczonym API lub izolacji

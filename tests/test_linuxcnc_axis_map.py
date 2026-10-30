@@ -312,3 +312,67 @@ def test_jog_proceeds_when_teleop_active():
     backend, command, _, _ = machine()
     backend.jog("Z", 1)
     command.jog.assert_called_once_with(6, False, 2, 1)
+
+
+# ---- A-03: jednostki (kontrakt: mm, mm/s, stopnie, °/s; maszyna: stat.linear/angular_units) ----
+INCH = 1 / 25.4
+
+
+def sent_jog(command):
+    return command.jog.call_args.args
+
+
+def test_linear_jog_speed_is_converted_to_machine_units():
+    backend, command, _, stat = machine()
+    stat.linear_units = INCH
+    backend.jog("Z", 10.0)
+    assert sent_jog(command)[3] == pytest.approx(10.0 * INCH)
+
+
+def test_incremental_jog_converts_speed_and_distance():
+    backend, command, _, stat = machine()
+    stat.linear_units = INCH
+    backend.jog_increment("X", 5.0, 0.1)
+    args = sent_jog(command)
+    assert args[3] == pytest.approx(5.0 * INCH)
+    assert args[4] == pytest.approx(0.1 * INCH)
+
+
+def test_angular_axis_uses_angular_units_not_linear():
+    backend, command, _, stat = machine("CBAXYZ", tuple(range(6)))
+    stat.linear_units = INCH
+    stat.angular_units = 0.5
+    backend.jog_increment("A", 20.0, 10.0)
+    args = sent_jog(command)
+    assert args[3] == pytest.approx(10.0)
+    assert args[4] == pytest.approx(5.0)
+
+
+@pytest.mark.parametrize("bad", [0.0, -1.0, float("nan"), float("inf")])
+def test_invalid_units_refuse_jog_before_any_command(bad):
+    backend, command, _, stat = machine()
+    stat.linear_units = bad
+    with pytest.raises(SafetyRefused):
+        backend.jog("Z", 1.0)
+    assert command.mock_calls == []
+
+
+def test_snapshot_positions_and_limits_are_reported_in_mm():
+    backend, _, _, stat = machine("XYZ", (0, 1, 2), homed=(1, 1, 1), limit=(0, 0, 0))
+    stat.linear_units = INCH
+    stat.actual_position = (1.0, 2.0, 3.0, 0, 0, 0, 0, 0, 0)
+    stat.position = (1.5, 2.0, 3.0, 0, 0, 0, 0, 0, 0)
+    stat.axis = ({"min_position_limit": -1.0, "max_position_limit": 2.0}, {}, {})
+    snap = backend.snapshot()
+    x = snap.axis("X")
+    assert x.position == pytest.approx(25.4)
+    assert x.commanded == pytest.approx(38.1)
+    assert x.soft_min == pytest.approx(-25.4)
+    assert x.soft_max == pytest.approx(50.8)
+
+
+def test_snapshot_angular_axis_converted_to_degrees():
+    backend, _, _, stat = machine("XYZABC", tuple(range(6)))
+    stat.angular_units = 0.5            # 0,5 jednostki maszyny na stopień
+    stat.actual_position = (0, 0, 0, 1.0, 0, 0, 0, 0, 0)
+    assert backend.snapshot().axis("A").position == pytest.approx(2.0)

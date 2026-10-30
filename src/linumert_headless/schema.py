@@ -103,7 +103,8 @@ class MachineState(Model):
 
 class JogRequest(Model):
     axis: AxisName
-    speed: float = Field(description="mm/s; 0 = zatrzymanie jogu tej osi")
+    speed: float = Field(description="mm/s dla osi liniowych, °/s dla A/B/C; znak = kierunek; "
+                                     "0 = STOP: backend LinuxCNC zatrzymuje cały ruch (ABORT)")
     session: str = Field("", description="identyfikator sesji — deadman jogu")
 
     @field_validator("speed")
@@ -122,7 +123,9 @@ class JogIncrementRequest(JogRequest):
             raise ValueError("prędkość przyrostu nie może być zerowa")
         return v
 
-    distance: float = Field(gt=0, description="krok przyrostowy [mm]")
+    distance: float = Field(
+        gt=0, description="krok przyrostowy: mm (osie liniowe) lub stopnie (A/B/C); "
+                          "kierunek wynika ze znaku prędkości")
 
 
 class JogKeepaliveRequest(Model):

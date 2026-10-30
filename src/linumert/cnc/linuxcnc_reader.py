@@ -15,6 +15,7 @@ Odbiór gantry na LinuxCNC 2.9 SIM pozostaje otwarty. NIEZWERYFIKOWANE NA SPRZĘ
 from __future__ import annotations
 
 import importlib
+import math
 import threading
 import time
 from collections.abc import Callable
@@ -79,6 +80,7 @@ class LinuxCNCReader:
         self._clock = clock
         self._axis_map: AxisMap | None = None
         self._ini_filename: str | None = None
+        self._factors: dict[str, float] = {}   # jednostki maszyny na mm (lub stopień), per oś
         # Bez wstrzykniętego modułu (produkcja) INI musi być starsze niż proces LinuxCNC;
         # atrapa modułu w testach nie ma procesu do sprawdzenia (chyba że podamy hak).
         if instance_started is None and module is None:
@@ -109,8 +111,9 @@ class LinuxCNCReader:
         mask = int(stat.axis_mask)
         indices = [i for i in range(len(AXIS_LETTERS)) if mask & (1 << i)]
         names = [AXIS_LETTERS[i] for i in indices]
+        self._factors = self._unit_factors(stat, names)
         axes = tuple(
-            self._axis(stat, mapping.joints_for(name), index, name)
+            self._axis(stat, mapping.joints_for(name), index, name, self._factors[name])
             for index, name in zip(indices, names, strict=True)
         )
         spindle = _item(getattr(stat, "spindle", ()), 0, {}) or {}
@@ -130,9 +133,11 @@ class LinuxCNCReader:
             spindle_speed=abs(float(spindle.get("speed", 0.0))),
             spindle_direction=int(spindle.get("direction", 0)),
             tool_number=int(getattr(stat, "tool_in_spindle", 0)),
-            tool_offset=self._by_axis(getattr(stat, "tool_offset", ()), indices, names),
+            tool_offset=self._by_axis(getattr(stat, "tool_offset", ()), indices, names,
+                                      self._factors),
             work_offset_name=offset_name,
-            work_offset=self._by_axis(getattr(stat, "g5x_offset", ()), indices, names),
+            work_offset=self._by_axis(getattr(stat, "g5x_offset", ()), indices, names,
+                                      self._factors),
             active_gcodes=self._codes(getattr(stat, "gcodes", ()), "G", 10),
             active_mcodes=self._codes(getattr(stat, "mcodes", ()), "M", 1),
             errors=self._drain_errors(module) if drain_errors else (),
@@ -185,21 +190,46 @@ class LinuxCNCReader:
         return self._axis_map
 
     @staticmethod
-    def _axis(stat: Any, joints: tuple[int, ...], index: int, name: str) -> AxisSnapshot:
+    def _unit_factors(stat: Any, names: list[str]) -> dict[str, float]:
+        """Jednostki maszyny na 1 mm (osie liniowe) lub 1 stopień (ABC), ze ``stat``."""
+        values = []
+        for field in ("linear_units", "angular_units"):
+            value = float(getattr(stat, field, 1.0))
+            if not math.isfinite(value) or value <= 0.0:
+                raise AxisMapError(f"niepoprawne jednostki maszyny: {field}={value!r}")
+            values.append(value)
+        linear, angular = values
+        return {name: angular if name in "ABC" else linear for name in names}
+
+    def machine_factor(self, axis: str) -> float:
+        """Mnożnik z jednostek kontraktu (mm, stopnie) na jednostki maszyny dla osi."""
+        with self._lock:
+            self._read_locked(drain_errors=False)
+            try:
+                return self._factors[axis.upper()]
+            except KeyError:
+                raise AxisMapError(f"nieznana oś {axis!r}") from None
+
+    @staticmethod
+    def _axis(stat: Any, joints: tuple[int, ...], index: int, name: str,
+              factor: float = 1.0) -> AxisSnapshot:
         limits = _item(getattr(stat, "axis", ()), index, {}) or {}
         return AxisSnapshot(
             name=name,
-            position=float(_item(stat.actual_position, index, 0.0)),
-            commanded=float(_item(stat.position, index, 0.0)),
+            position=float(_item(stat.actual_position, index, 0.0)) / factor,
+            commanded=float(_item(stat.position, index, 0.0)) / factor,
             homed=all(bool(stat.homed[joint]) for joint in joints),
-            soft_min=float(limits.get("min_position_limit", float("-inf"))),
-            soft_max=float(limits.get("max_position_limit", float("inf"))),
+            soft_min=float(limits.get("min_position_limit", float("-inf"))) / factor,
+            soft_max=float(limits.get("max_position_limit", float("inf"))) / factor,
             limit_hit=any(bool(stat.limit[joint]) for joint in joints),
         )
 
     @staticmethod
-    def _by_axis(values: Any, indices: list[int], names: list[str]) -> dict[str, float]:
-        return {name: float(_item(values, i, 0.0)) for i, name in zip(indices, names, strict=True)}
+    def _by_axis(values: Any, indices: list[int], names: list[str],
+                 factors: dict[str, float] | None = None) -> dict[str, float]:
+        factors = factors or {}
+        return {name: float(_item(values, i, 0.0)) / factors.get(name, 1.0)
+                for i, name in zip(indices, names, strict=True)}
 
     @staticmethod
     def _codes(values: Any, prefix: str, divisor: int) -> tuple[str, ...]:

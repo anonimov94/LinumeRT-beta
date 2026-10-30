@@ -168,23 +168,25 @@ class LinuxCNCBackend:
             self.jog_stop(axis)
             return
         index = self._axis(axis)
+        factor = self._factor(axis)
         cmd = self._cmd()
         cmd.mode(self._lc().MODE_MANUAL)
         self._wait()
         cmd.teleop_enable(1)
         self._wait()
         self._require_teleop()
-        cmd.jog(self._lc().JOG_CONTINUOUS, False, index, speed)
+        cmd.jog(self._lc().JOG_CONTINUOUS, False, index, speed * factor)
 
     def jog_increment(self, axis: str, speed: float, distance: float) -> None:
         index = self._axis(axis)
+        factor = self._factor(axis)
         cmd = self._cmd()
         cmd.mode(self._lc().MODE_MANUAL)
         self._wait()
         cmd.teleop_enable(1)
         self._wait()
         self._require_teleop()
-        cmd.jog(self._lc().JOG_INCREMENT, False, index, speed, distance)
+        cmd.jog(self._lc().JOG_INCREMENT, False, index, speed * factor, distance * factor)
 
     def jog_stop(self, axis: str | None) -> None:
         # Wysyłamy ABORT również w trybie joint i przy uszkodzonym INI/NML.
@@ -203,6 +205,13 @@ class LinuxCNCBackend:
             raise SafetyRefused(str(exc)) from exc
         except Exception as exc:
             raise BackendUnavailable(f"brak aktualnego mapowania LinuxCNC: {exc}") from exc
+
+    def _factor(self, axis: str) -> float:
+        """Kontrakt: mm i mm/s (osie liniowe), stopnie i °/s (ABC); LinuxCNC: jednostki maszyny."""
+        try:
+            return self.reader.machine_factor(axis)
+        except AxisMapError as exc:
+            raise SafetyRefused(str(exc)) from exc
 
     def _require_teleop(self) -> None:
         """Potwierdza teleop: bez zbazowanych jointów LinuxCNC go nie włączy, a jog byłby cichy."""
