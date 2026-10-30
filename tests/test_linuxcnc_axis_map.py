@@ -271,3 +271,25 @@ def test_changed_ini_path_with_identical_mapping_refuses():
     with pytest.raises(SafetyRefused, match="rozruch"):
         backend.home("Z")
     assert command.mock_calls == []
+
+
+def test_command_mapping_refresh_keeps_linuxcnc_errors_for_state_reads():
+    backend, _, _, _ = machine()
+    messages = [(1, "BLAD1"), (1, "BLAD2")]
+    channel = Mock()
+    channel.poll.side_effect = lambda: messages.pop(0) if messages else None
+    backend.reader._error_channel = channel
+    backend.jog("Z", 1)
+    assert backend.snapshot().errors == ("BLAD1", "BLAD2")
+
+
+def test_mapping_refusal_marks_backend_not_alive_in_state_loop():
+    from linumert_headless.app import build_application
+
+    backend, _, _, stat = machine()
+    backend.snapshot()
+    stat.ini_filename = "/test/changed.ini"
+    app = build_application(backend=backend)
+    app.hub.update("health", backend_alive=True)
+    app.publish_state()
+    assert app.hub.snapshot(topics=("health",))["topics"]["health"]["backend_alive"] is False

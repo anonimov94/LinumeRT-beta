@@ -33,7 +33,7 @@ from .contract import (
     Context,
     Contract,
 )
-from .errors import ApiError, BackendUnavailable
+from .errors import ApiError, BackendUnavailable, SafetyRefused
 from .plugins import PluginManager, register_plugin_operations
 from .schema import (
     AccessAuditOut,
@@ -245,7 +245,7 @@ class Application:
                     log.info("deadman jogu wygasł — stop %s", axis)
                 self.backend.tick()
                 self.publish_state()
-            except BackendUnavailable:
+            except (BackendUnavailable, SafetyRefused):
                 self.hub.update("health", backend_alive=False)
             except Exception:
                 log.exception("błąd pętli stanu")
@@ -255,7 +255,8 @@ class Application:
         machine: MachineService = self.services["machine"]
         try:
             state = machine.state()
-        except BackendUnavailable:
+        except (BackendUnavailable, SafetyRefused):
+            # SafetyRefused: backend odmawia (np. niespójne mapowanie jointów).
             return self.hub.update("health", backend_alive=False)
         self.hub.publish("machine", state.model_dump(mode="json"))
         active = self.services["alarm"].list(limit=50)

@@ -92,7 +92,7 @@ class LinuxCNCReader:
         with self._lock:
             return self._read_locked()
 
-    def _read_locked(self) -> MachineSnapshot:
+    def _read_locked(self, drain_errors: bool = True) -> MachineSnapshot:
         module = self._linuxcnc()
         if self._stat is None:
             self._stat = module.stat()
@@ -128,13 +128,13 @@ class LinuxCNCReader:
             work_offset=self._by_axis(getattr(stat, "g5x_offset", ()), indices, names),
             active_gcodes=self._codes(getattr(stat, "gcodes", ()), "G", 10),
             active_mcodes=self._codes(getattr(stat, "mcodes", ()), "M", 1),
-            errors=self._drain_errors(module),
+            errors=self._drain_errors(module) if drain_errors else (),
         )
 
     def axis_mapping(self) -> AxisMap:
-        """Odświeża stan przed użyciem mapowania do polecenia."""
+        """Odświeża stan przed użyciem mapowania; nie zabiera błędów z kanału LinuxCNC."""
         with self._lock:
-            self.read()
+            self._read_locked(drain_errors=False)
             if self._axis_map is None:
                 raise AxisMapError("brak mapowania jointów")
             return self._axis_map
