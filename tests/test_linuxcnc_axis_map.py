@@ -237,3 +237,37 @@ def test_positive_member_of_cross_axis_sync_group_refuses_axis_home():
     with pytest.raises(SafetyRefused, match="inne osie"):
         backend.home("Y")
     assert command.mock_calls == []
+
+
+@pytest.mark.parametrize("action", [lambda b: b.home("Y"), lambda b: b.jog("Z", 1),
+                                     lambda b: b.jog_increment("Z", 1, 0.1)])
+@pytest.mark.parametrize("failure", [-1, 3])
+def test_teleop_confirmation_failure_prevents_motion(action, failure):
+    backend, command, _, _ = machine()
+    command.wait_complete.side_effect = [1, failure]
+    from linumert_headless.errors import BackendUnavailable, Conflict
+
+    with pytest.raises(BackendUnavailable if failure == -1 else Conflict):
+        action(backend)
+    command.home.assert_not_called()
+    command.jog.assert_not_called()
+
+
+@pytest.mark.parametrize("action", [lambda b: b.jog_stop(None), lambda b: b.jog_stop("Y"),
+                                     lambda b: b.jog("Y", 0)])
+def test_jog_stop_aborts_without_reading_failed_nml(action):
+    backend, command, _, stat = machine()
+    stat.poll = Mock(side_effect=RuntimeError("brak NML"))
+    action(backend)
+    command.abort.assert_called_once_with()
+    stat.poll.assert_not_called()
+    command.jog.assert_not_called()
+
+
+def test_changed_ini_path_with_identical_mapping_refuses():
+    backend, command, _, stat = machine()
+    backend.snapshot()
+    stat.ini_filename = "/test/identical.ini"
+    with pytest.raises(SafetyRefused, match="rozruch"):
+        backend.home("Z")
+    assert command.mock_calls == []
