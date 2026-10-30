@@ -11,6 +11,65 @@ Czytaj TYLKO ten plik na start (≈2 min), potem tylko pliki ze swojego zadania.
 Dokumenty tematyczne: `docs/PLUGINS.md` (wtyczki), `docs/SOCKET.md` (protokół socket), `docs/NATIVE.md` (rdzeń C),
 `SAFETY.md` (bezpieczeństwo), `ROADMAP.md` (stan prac, generowany).
 
+## Przekazanie między sesjami — aktualizacja 2026-10-30
+
+**Zacznij od sprawdzenia gałęzi i SHA, nie od ponownego wdrażania A-01/A-02.**
+Właściciel zatwierdził A-01/A-02 z zachowaniem odziedziczonego rdzenia, a następnie
+polecił wypchnąć zmiany i uzupełnić ten plik. Zgoda dotyczy publikacji gałęzi audytu;
+nie jest zgodą na merge do `main`, uruchomienie sprzętu ani automatyczny odbiór P0/P1.
+
+### Co wykonano i gdzie szukać dowodów
+
+- Gałęzie do publikacji: `audit/a01-documentation` oraz oparta na niej
+  `audit/a02-joint-map` (bieżąca, zawiera całość zmian i aktualne przekazanie).
+  Sprawdź ich faktyczną dostępność przez `git ls-remote origin`; nie zakładaj,
+  że `main` zawiera te zmiany. Ostatnio sprawdzony `main`: `57bc2c1`.
+- **A-01 — partial:** poprawiony opis zaufania do wtyczek, generator `tools/stan.py`,
+  raport `docs/STAN.md` i test zgodności z kontraktem. Implementacja gotowa lokalnie;
+  do zamknięcia pozostaje niezależna recenzja. Commity: `aa76eb8`, `105e36f`.
+- **A-02 — blocked na odbiorze:** regresja przed poprawką `28287cf` (21 nieudanych,
+  4 udane przypadki), poprawka `1b62dd5`: `src/linumert/cnc/axis_map.py`, czytnik
+  LinuxCNC i backend. Mapowanie z INI/NML, gantry, ABC, agregacja home/limit,
+  odmowa niespójności i niejednoznacznego bazowania. Testy: `tests/test_linuxcnc_axis_map.py`.
+- Ograniczenia: obsługiwane tylko `trivkins`; gantry wymaga synchronizacji;
+  zmiana mapowania INI podczas działania wymaga ponownego rozruchu aplikacji.
+  **STOP JOG wysyła ABORT dla całego ruchu**, także dla pojedynczej osi/prędkości zero.
+  Opis `JogRequest.speed` w kontrakcie nadal mówi o zatrzymaniu osi — ujednolicić w A-03.
+- Dowody: [raport audytu](docs/AUDYT_A01_A02.md) i [log](docs/AUDYT_A01_A02_LOCAL.log).
+  Lint PASS; pełny przebieg z limitem 300 s PASS; po końcowych poprawkach 75 testów PASS.
+  Pełny przebieg rozpoczęto przed ostatnimi poprawkami; dokładny zakres jest w raporcie.
+  Domyślny limit 60 s wcześniej przerwał istniejący fuzzing symulacji; testów nie osłabiano.
+  Te wyniki nie stanowią odbioru SIM ani sprzętu.
+
+### Kolejność dalszych prac
+
+1. **Niezależna recenzja A-01/A-02**, zwłaszcza grup HOME_SEQUENCE, zmiany INI,
+   odmów przed poleceniami i zakresu ABORT. Nie oznaczaj etapów `done` bez wymaganego odbioru.
+2. **D0 / LinuxCNC 2.9 SIM:** ustalić platformę testową; lokalnie brak LinuxCNC/HAL.
+   Wykonać macierz z raportu: X/Y1/Y2/Z, przestawione jointy ABC, HOME ALL i grupy,
+   home/limit, błędne INI/NML, JOG teleop oraz STOP w teleop/joint i przy awarii odczytu.
+   Zachować wersję LinuxCNC, konfigurację i SHA. **NIEZWERYFIKOWANE NA SPRZĘCIE.**
+3. **A-03 / jednostki JOG:** mm i mm/s kontra stopnie i stopnie/s, konwersja jednostek
+   INI, G20/G21, continuous/incremental, deadman/STOP i zgodny opis kontraktu.
+4. **A-04 / role:** bezpieczne domyślne ustawienia LinuxCNC, brak PIN/sekretu,
+   wszystkie transporty, restart i wygaśnięcie sesji; ustalić inicjalizację poświadczeń D3.
+5. **A-05 / wtyczki:** decyzja D4 o zaufanych wtyczkach z ograniczonym API lub izolacji
+   procesu. Dostęp do usług nadal istnieje; A-01 poprawił dokumentację, nie izolację.
+6. **A-06 / watchdog HAL:** utrata łączności/procesu, SIGSTOP, błędy STOP, restart;
+   osobny odbiór HAL, bez zastępowania sprzętowego E-STOP/STO programem.
+7. **A-07 / CI i raporty:** lint, testy Python/C, sanitizery, kontrakt, roadmapa;
+   wyjaśnić stare logi E-STOP. Kolejność wcześniejszego CI wymaga decyzji D5.
+   **A-08:** utrwalić pochodzenie rdzenia i decyzję o jego zachowaniu; nie przepisywać od zera.
+
+Szczegóły kolejnych zakresów i decyzji: `docs/PLAN_AUDYTU_P0_P1.md`.
+Przed zmianami bezpieczeństwa poza A-01/A-02 sprawdź, czy właściciel zatwierdził konkretny
+zakres w bieżącej lub wcześniejszej sesji. Nowe funkcje/GUI/niezwiązane optymalizacje są wstrzymane.
+Statusy utrzymuj narzędziem roadmapy; ten skrót jest przekazaniem, nie drugim rejestrem statusów.
+Do lokalnych sprawdzeń używaj `.venv/bin/python` (systemowy Python nie ma pytest):
+`make PYTHON=.venv/bin/python lint`, a pełny przebieg w tym środowisku:
+`PYTEST_ADDOPTS='--timeout=300' make PYTHON=.venv/bin/python test`.
+Nie przepisuj historycznego PASS jako wyniku nowej sesji.
+
 ## Zasady (obowiązują zawsze)
 1. **Bez GUI** w rdzeniu (strażnik: `tools/check_no_gui.py`). GUI powstaje na końcu jako klient kontraktu.
 2. **Push i PR tylko na wyraźne polecenie właściciela;** testy lokalne (`make test`).

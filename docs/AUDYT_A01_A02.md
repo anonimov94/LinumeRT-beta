@@ -6,7 +6,9 @@ SPDX-License-Identifier: GPL-2.0-or-later
 
 Właściciel zatwierdził w rozmowie rozpoczęcie A-01 i A-02, na osobnych gałęziach,
 z zachowaniem odziedziczonego rdzenia. Nie obejmuje to pozostałych P1, nowych funkcji,
-push, PR ani scalenia do main. Gałąź A-02 bazuje na zmianach A-01.
+PR ani scalenia do main. Gałąź A-02 bazuje na zmianach A-01.
+W kolejnym poleceniu właściciel zatwierdził push gałęzi audytu oraz aktualizację
+`AGENTS.md` dla przyszłych sesji; nie rozszerza to odbioru SIM ani sprzętu.
 
 ## Dowody przed poprawką
 

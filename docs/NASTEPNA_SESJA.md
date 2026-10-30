@@ -8,7 +8,9 @@ Model-Author: Codex · 2026-10-30
 - GitHub sprawdzony na początku sesji: `main` @ `57bc2c1`, `audit/plan-p0-p1` @ `a08b547`.
 - Właściciel zatwierdził A-01 i A-02, na osobnych gałęziach, bez przepisywania rdzenia.
 - Lokalnie: `audit/a01-documentation` (dokumentacja i generator raportu) oraz oparta
-  na niej `audit/a02-joint-map` (poprawka P0). Nie wykonano push, PR ani merge.
+  na niej `audit/a02-joint-map` (poprawka P0). Właściciel następnie polecił push obu
+  gałęzi; dostępność i SHA zweryfikuj przez `git ls-remote origin`. Bez zgody na merge.
+- Aktualny skrót postępu, ograniczeń i kolejnych zadań znajduje się w `AGENTS.md`.
 - Dowody, zmiany zachowania i ograniczenia: [AUDYT_A01_A02.md](AUDYT_A01_A02.md).
 - Pozostałe P1 i nowe funkcje nadal otwarte. NIEZWERYFIKOWANE NA SPRZĘCIE.
 
@@ -16,7 +18,7 @@ Model-Author: Codex · 2026-10-30
 
 1. Przeczytać obowiązkowy `CODEX_STOP_READ.md`, `AGENTS.md`, `SAFETY.md` i raport zmian.
 2. Sprawdzić aktualne SHA, gałąź i stan roboczy. Zmiany A-01/A-02 są już lokalnie;
-   nie zaczynać ich ponownie i nie zakładać, że znajdują się na GitHub.
+   nie zaczynać ich ponownie; porównać lokalne SHA z gałęziami GitHub.
 3. Niezależna recenzja zmian oraz decyzja D0 o środowisku LinuxCNC 2.9 SIM.
    A-02 pozostaje zablokowane w części integracyjnej. Nie zamykać na podstawie atrap.
 4. Push/PR wyłącznie na wyraźne polecenie. Dalsze P1 wymagają zatwierdzenia zakresu.
