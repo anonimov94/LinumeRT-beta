@@ -26,7 +26,7 @@ def machine(coords="XYYZ", sequences=(0, -1, -1, 2), **state):
         if sequence is not None:
             values[f"JOINT_{j}", "HOME_SEQUENCE"] = str(sequence)
     defaults = dict(joints=len(coords), axis_mask=sum(1 << letters.index(x) for x in set(coords)),
-                    ini_filename="/test/machine.ini", kinematics_type=12,
+                    ini_filename="/test/machine.ini", kinematics_type=12, motion_mode=3,
                     homed=(1,) * len(coords), limit=(0,) * len(coords))
     defaults.update(state)
     module = fake_module(**defaults)
@@ -41,6 +41,7 @@ def machine(coords="XYYZ", sequences=(0, -1, -1, 2), **state):
     module.RCS_ERROR = 3
     module.JOG_CONTINUOUS = 6
     module.JOG_INCREMENT = 7
+    module.TRAJ_MODE_TELEOP = 3
     reader = LinuxCNCReader(module=module)
     return LinuxCNCBackend(module=module, reader=reader), command, values, module.stat()
 
@@ -293,3 +294,21 @@ def test_mapping_refusal_marks_backend_not_alive_in_state_loop():
     app.hub.update("health", backend_alive=True)
     app.publish_state()
     assert app.hub.snapshot(topics=("health",))["topics"]["health"]["backend_alive"] is False
+
+
+@pytest.mark.parametrize("action", [lambda b: b.jog("Z", 1),
+                                    lambda b: b.jog_increment("Z", 1, 0.1)])
+def test_jog_refuses_when_teleop_not_active(action):
+    # LinuxCNC zostaje w trybie joint, gdy nie wszystkie jointy są zbazowane (potwierdzone na SIM).
+    backend, command, _, stat = machine()
+    stat.motion_mode = 1
+    backend._timeout = 0.2
+    with pytest.raises(SafetyRefused, match="teleop"):
+        action(backend)
+    command.jog.assert_not_called()
+
+
+def test_jog_proceeds_when_teleop_active():
+    backend, command, _, _ = machine()
+    backend.jog("Z", 1)
+    command.jog.assert_called_once_with(6, False, 2, 1)

@@ -21,6 +21,7 @@ from collections.abc import Callable
 from typing import Any
 
 from .axis_map import AxisMap, AxisMapError
+from .instance import cached_start_lookup, ini_changed_after_start
 from .model import (
     AXIS_LETTERS,
     AxisSnapshot,
@@ -69,6 +70,7 @@ class LinuxCNCReader:
         stat: Any = None,
         error_channel: Any = None,
         clock: Callable[[], float] = time.monotonic,
+        instance_started: Callable[[str], float | None] | None = None,
     ):
         self._module = module
         self._stat = stat
@@ -77,6 +79,11 @@ class LinuxCNCReader:
         self._clock = clock
         self._axis_map: AxisMap | None = None
         self._ini_filename: str | None = None
+        # Bez wstrzykniętego modułu (produkcja) INI musi być starsze niż proces LinuxCNC;
+        # atrapa modułu w testach nie ma procesu do sprawdzenia (chyba że podamy hak).
+        if instance_started is None and module is None:
+            instance_started = cached_start_lookup()
+        self._instance_started = instance_started
 
     def _linuxcnc(self) -> Any:
         if self._module is None:
@@ -131,6 +138,15 @@ class LinuxCNCReader:
             errors=self._drain_errors(module) if drain_errors else (),
         )
 
+    def teleop_active(self) -> bool:
+        """Czy ruch jest w trybie teleop (``stat.motion_mode``); nie ruszamy kanału błędów."""
+        with self._lock:
+            module = self._linuxcnc()
+            if self._stat is None:
+                self._stat = module.stat()
+            self._stat.poll()
+            return int(self._stat.motion_mode) == int(module.TRAJ_MODE_TELEOP)
+
     def axis_mapping(self) -> AxisMap:
         """Odświeża stan przed użyciem mapowania; nie zabiera błędów z kanału LinuxCNC."""
         with self._lock:
@@ -139,10 +155,24 @@ class LinuxCNCReader:
                 raise AxisMapError("brak mapowania jointów")
             return self._axis_map
 
+    def _check_ini_fresh(self, filename: str) -> None:
+        if self._instance_started is None:
+            return
+        start = self._instance_started(filename)
+        if start is None:
+            raise AxisMapError("nie można ustalić czasu startu instancji LinuxCNC dla tego INI")
+        try:
+            changed = ini_changed_after_start(filename, start)
+        except OSError as exc:
+            raise AxisMapError(f"nie można sprawdzić czasu zmiany INI: {exc}") from exc
+        if changed:
+            raise AxisMapError("INI zmieniono po starcie LinuxCNC; uruchom LinuxCNC ponownie")
+
     def _mapping(self, stat: Any, module: Any) -> AxisMap:
         filename = getattr(stat, "ini_filename", "")
         if not filename:
             raise AxisMapError("brak INI działającej instancji LinuxCNC")
+        self._check_ini_fresh(filename)
         try:
             mapping = AxisMap.from_ini(module.ini(filename), module)
         except Exception as exc:

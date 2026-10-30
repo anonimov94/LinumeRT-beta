@@ -173,6 +173,7 @@ class LinuxCNCBackend:
         self._wait()
         cmd.teleop_enable(1)
         self._wait()
+        self._require_teleop()
         cmd.jog(self._lc().JOG_CONTINUOUS, False, index, speed)
 
     def jog_increment(self, axis: str, speed: float, distance: float) -> None:
@@ -182,6 +183,7 @@ class LinuxCNCBackend:
         self._wait()
         cmd.teleop_enable(1)
         self._wait()
+        self._require_teleop()
         cmd.jog(self._lc().JOG_INCREMENT, False, index, speed, distance)
 
     def jog_stop(self, axis: str | None) -> None:
@@ -201,6 +203,24 @@ class LinuxCNCBackend:
             raise SafetyRefused(str(exc)) from exc
         except Exception as exc:
             raise BackendUnavailable(f"brak aktualnego mapowania LinuxCNC: {exc}") from exc
+
+    def _require_teleop(self) -> None:
+        """Potwierdza teleop: bez zbazowanych jointów LinuxCNC go nie włączy, a jog byłby cichy."""
+        check = getattr(self.reader, "teleop_active", None)
+        if check is None:
+            return
+        deadline = time.monotonic() + self._timeout
+        while True:
+            try:
+                if check():
+                    return
+            except Exception as exc:
+                raise BackendUnavailable(f"odczyt trybu ruchu nie powiódł się: {exc}") from exc
+            if time.monotonic() >= deadline:
+                break
+            time.sleep(0.05)
+        raise SafetyRefused("tryb teleop niedostępny (LinuxCNC wymaga zbazowania wszystkich "
+                            "jointów); jog nie został wysłany")
 
     def _axis(self, axis: str) -> int:
         try:
