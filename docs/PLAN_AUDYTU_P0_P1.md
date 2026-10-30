@@ -1,7 +1,11 @@
 # Plan działania po audycie P0/P1 (CODEX_STOP_READ.md)
 
 SPDX-License-Identifier: GPL-2.0-or-later
-Model-Author: Claude · 2026-10-29 · stan: **PROPOZYCJA do decyzji właściciela** (nic z tego planu nie jest wdrożone)
+Model-Author: Claude · 2026-10-29 · plan wyjściowy.
+
+Aktualizacja 2026-10-30: właściciel zatwierdził A-01 i A-02 z zachowaniem obecnego rdzenia.
+Zmiany lokalne i ograniczenia odbioru: [raport A-01/A-02](AUDYT_A01_A02.md).
+Pozostały zakres nadal wymaga decyzji; ten dokument nie jest raportem wykonania.
 
 Punkt odniesienia: `main` @ `57bc2c1`. Źródło zarzutów: [CODEX_STOP_READ.md](../CODEX_STOP_READ.md) (niezależny
 przegląd; zalecenia, nie raport Codexa). Zasady: [AGENTS.md](../AGENTS.md), [SAFETY.md](../SAFETY.md).

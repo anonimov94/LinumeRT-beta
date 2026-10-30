@@ -113,11 +113,11 @@ Aktualizacja: 2026-10-30 · planowane: 18 · częściowe: 65 · ukończone: 10 �
 ## Pozostały zakres
 
 ### A-01 Audyt: uczciwość dokumentacji (fałszywe zdanie o wtyczkach, liczby generowane narzędziem)
-- Dokumentacja i generator wdrożone; make lint PASS, pełne testy przerwane limitem 60 s w test_native_sim.py::test_fuzzing_zgodny_z_pythonem; ponowna weryfikacja z dłuższym limitem
+- Zakres zatwierdzony i wdrożony; lokalne kontrole PASS (pełne testy z limitem 300 s). Pozostaje niezależna recenzja; dowody: docs/AUDYT_A01_A02.md
 
 ### A-02 Audyt P0: jawny model joint↔oś (gantry X/Y1/Y2/Z, osie obrotowe), bezpieczna odmowa
-- Część integracyjna wymaga LinuxCNC 2.9 SIM (decyzja D0)
-- Plan: docs/PLAN_AUDYTU_P0_P1.md §4 A-02
+- Poprawka i lokalne regresje wdrożone: 1b62dd5; 75 końcowych testów PASS. Dowody: docs/AUDYT_A01_A02.md
+- Pozostaje niezależna recenzja oraz odbiór LinuxCNC 2.9 SIM (D0: wybór środowiska); NIEZWERYFIKOWANE NA SPRZĘCIE
 
 ### A-03 Audyt P1: jednostki i poprawność JOG (liniowe mm, obrotowe stopnie, jednostki INI)
 - Plan: docs/PLAN_AUDYTU_P0_P1.md §4 A-03
