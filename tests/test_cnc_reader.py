@@ -38,12 +38,25 @@ def fake_module(**stat_values):
         "gcodes": (7, 10, 170, 210, 551, 901, -1), "mcodes": (7, 5, -1, 9),
     }
     values.update(stat_values)
+    coords = "".join(letter for i, letter in enumerate("XYZABCUVW")
+                     if values["axis_mask"] & (1 << i))
+    values.setdefault("joints", len(coords))
+    values.setdefault("ini_filename", "/test/reader.ini")
+    values.setdefault("kinematics_type", 11)
+    ini_values = {("KINS", "JOINTS"): str(len(coords)),
+                  ("KINS", "KINEMATICS"): f"trivkins coordinates={coords}",
+                  ("TRAJ", "COORDINATES"): coords}
+    for joint, letter in enumerate(coords):
+        ini_values[f"JOINT_{joint}", "TYPE"] = "ANGULAR" if letter in "ABC" else "LINEAR"
     stat = SimpleNamespace(poll=lambda: None, **values)
     return SimpleNamespace(
         STATE_ESTOP=1, STATE_ESTOP_RESET=2, STATE_OFF=3, STATE_ON=70,
         MODE_MANUAL=1, MODE_AUTO=2, MODE_MDI=80,
         INTERP_IDLE=1, INTERP_READING=2, INTERP_PAUSED=91, INTERP_WAITING=4,
         stat=lambda: stat,
+        KINEMATICS_IDENTITY=11, KINEMATICS_BOTH=12,
+        ini=lambda path: SimpleNamespace(findall=lambda section, key:
+            [ini_values[section, key]] if (section, key) in ini_values else []),
         error_channel=lambda: FakeChannel([(1, "blad A"), (2, "info B")]),
     )
 
@@ -79,7 +92,7 @@ def test_axes_positions_homing_and_limits():
 
 def test_axis_mask_selects_letters_for_four_axis_machine():
     snap = read(
-        axis_mask=0b1111, homed=(1, 1, 1, 1), axis=(),
+        axis_mask=0b1111, homed=(1, 1, 1, 1), limit=(0, 0, 0, 0), axis=(),
         actual_position=(1, 2, 3, 90, 0, 0, 0, 0, 0), position=(1, 2, 3, 90, 0, 0, 0, 0, 0),
     )
     assert snap.axis_names == ("X", "Y", "Z", "A")

@@ -5,6 +5,7 @@ from unittest.mock import Mock
 
 import pytest
 
+from linumert.cnc.axis_map import AxisMap
 from linumert_headless.__main__ import _config, build_arg_parser
 from linumert_headless.backends.linuxcnc import LinuxCNCBackend
 from linumert_headless.errors import BackendUnavailable, Conflict
@@ -34,7 +35,8 @@ def make_backend(result=1):
     command.wait_complete.return_value = result
     module = SimpleNamespace(command=lambda: command, STATE_ESTOP=1, STATE_ESTOP_RESET=2,
                              RCS_ERROR=3, MODE_MANUAL=4, MODE_MDI=5, JOG_CONTINUOUS=6)
-    reader = SimpleNamespace(read=lambda: SimpleNamespace(axis_names=("X", "Z")))
+    reader = SimpleNamespace(read=lambda: SimpleNamespace(axis_names=("X", "Z")),
+                             axis_mapping=lambda: AxisMap(("X", "Z"), (0, 1), 11))
     return LinuxCNCBackend(module=module, reader=reader), command
 
 

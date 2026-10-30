@@ -7,11 +7,11 @@ from types import SimpleNamespace
 from unittest.mock import Mock
 
 import pytest
+from test_cnc_reader import fake_module
 
 from linumert.cnc.linuxcnc_reader import LinuxCNCReader
 from linumert_headless.backends.linuxcnc import LinuxCNCBackend
 from linumert_headless.errors import SafetyRefused
-from test_cnc_reader import fake_module
 
 
 def machine(coords="XYYZ", sequences=(0, -1, -1, 2), **state):
@@ -135,4 +135,105 @@ def test_invalid_jog_axis_has_no_mode_side_effects():
     backend, command, _, _ = machine()
     with pytest.raises(SafetyRefused):
         backend.jog("A", 1)
+    assert command.mock_calls == []
+
+
+def test_home_all_uses_linuxcnc_sequence_order():
+    backend, command, _, _ = machine(sequences=(0, -1, -1, -1))
+    backend.home(None)
+    command.home.assert_called_once_with(-1)
+
+
+@pytest.mark.parametrize("sequences", [(0, -1, -1, None), (0, -2, -2, 3)])
+def test_home_all_missing_or_gapped_sequence_refuses(sequences):
+    backend, command, _, _ = machine(sequences=sequences)
+    with pytest.raises(SafetyRefused):
+        backend.home(None)
+    assert command.mock_calls == []
+
+
+def test_mixed_sign_gantry_uses_negative_joint():
+    backend, command, _, _ = machine(sequences=(0, 1, -1, 2))
+    backend.home("Y")
+    command.home.assert_called_once_with(2)
+
+
+@pytest.mark.parametrize("action", [lambda b: b.estop(), lambda b: b.stop(),
+                                     lambda b: b.jog_stop(None), lambda b: b.jog_stop("Y"),
+                                     lambda b: b.jog("Y", 0)])
+def test_stop_remains_available_with_invalid_mapping(action):
+    backend, command, _, stat = machine(ini_filename="")
+    action(backend)
+    assert command.state.called or command.abort.called
+
+
+def test_state_is_revalidated_after_successful_read():
+    backend, command, _, stat = machine()
+    backend.snapshot()
+    stat.joints = 3
+    with pytest.raises(SafetyRefused):
+        backend.home("Z")
+    assert command.mock_calls == []
+
+
+def test_reader_reloads_on_instance_ini_change():
+    backend, command, values, stat = machine()
+    backend.snapshot()
+    stat.ini_filename = "/test/changed.ini"
+    values["KINS", "KINEMATICS"] = "unknownkins"
+    with pytest.raises(SafetyRefused):
+        backend.home("Z")
+    assert command.mock_calls == []
+
+
+def test_rotary_axis_flags_use_joint_order():
+    backend, _, _, _ = machine("CBAXYZ", (0, 1, 2, 3, 4, 5),
+                               homed=(0, 1, 1, 1, 1, 1), limit=(1, 0, 0, 0, 0, 0))
+    snap = backend.snapshot()
+    assert not snap.axis("C").homed and snap.axis("C").limit_hit
+    assert snap.axis("X").homed and not snap.axis("X").limit_hit
+    mapping = backend.reader.axis_mapping()
+    assert mapping.axis_kind("C") == "angular"
+    assert mapping.axis_kind("X") == "linear"
+
+
+def test_default_trivkins_coordinates_are_not_derived_from_traj():
+    backend, command, values, stat = machine("XZ", (0, 1))
+    values["KINS", "KINEMATICS"] = "trivkins kinstype=BOTH"
+    with pytest.raises(SafetyRefused):
+        backend.home("Z")
+    assert command.mock_calls == []
+
+
+def test_mode_failure_does_not_start_homing():
+    backend, command, _, _ = machine()
+    command.wait_complete.return_value = -1
+    from linumert_headless.errors import BackendUnavailable
+
+    with pytest.raises(BackendUnavailable):
+        backend.home("Z")
+    command.home.assert_not_called()
+
+
+def test_changed_mapping_in_same_ini_refuses_until_restart():
+    backend, command, values, stat = machine()
+    backend.snapshot()
+    values["KINS", "KINEMATICS"] = "trivkins coordinates=XYZY kinstype=BOTH"
+    with pytest.raises(SafetyRefused, match="rozruch"):
+        backend.home("Z")
+    assert command.mock_calls == []
+
+
+def test_duplicate_ini_mapping_key_refuses():
+    backend, command, _, _ = machine()
+    backend.reader._module.ini = lambda path: SimpleNamespace(findall=lambda *args: ["3", "4"])
+    with pytest.raises(SafetyRefused):
+        backend.home("Z")
+    assert command.mock_calls == []
+
+
+def test_positive_member_of_cross_axis_sync_group_refuses_axis_home():
+    backend, command, _, _ = machine("XYZ", (0, 1, -1))
+    with pytest.raises(SafetyRefused, match="inne osie"):
+        backend.home("Y")
     assert command.mock_calls == []

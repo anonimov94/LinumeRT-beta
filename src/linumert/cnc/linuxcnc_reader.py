@@ -7,18 +7,20 @@ Modul ``linuxcnc`` jest importowany leniwie, przy pierwszym ``read()``; sam impo
 pliku (i calego pakietu ``linumert``) go nie wymaga. Modul i obiekty ``stat`` /
 ``error_channel`` mozna wstrzyknac, co pozwala testowac mapowanie bez LinuxCNC.
 
-Mapowanie sprawdzone na LinuxCNC 2.9 RIP (sesja 008, ``tests/test_reader_linuxcnc.py``:
-stan, tryb, bazowanie, pozycje, limity z INI, ``gcodes``/``mcodes``, G55, ``spindle[0]``).
-Zalozenie: kinematyka tożsamościowa (trivkins), czyli i-ta zbazowana os to i-ty staw.
+Mapowanie pochodzi z INI działającej instancji (stat.ini_filename), nigdy z kolejności
+liter axis_mask. Obsługiwane jest trivkins; inne kinematyki wymagają osobnego modelu.
+Odbiór gantry na LinuxCNC 2.9 SIM pozostaje otwarty. NIEZWERYFIKOWANE NA SPRZĘCIE.
 """
 
 from __future__ import annotations
 
 import importlib
+import threading
 import time
 from collections.abc import Callable
 from typing import Any
 
+from .axis_map import AxisMap, AxisMapError
 from .model import (
     AXIS_LETTERS,
     AxisSnapshot,
@@ -71,7 +73,10 @@ class LinuxCNCReader:
         self._module = module
         self._stat = stat
         self._error_channel = error_channel
+        self._lock = threading.RLock()
         self._clock = clock
+        self._axis_map: AxisMap | None = None
+        self._ini_filename: str | None = None
 
     def _linuxcnc(self) -> Any:
         if self._module is None:
@@ -84,17 +89,22 @@ class LinuxCNCReader:
         return self._module
 
     def read(self) -> MachineSnapshot:
+        with self._lock:
+            return self._read_locked()
+
+    def _read_locked(self) -> MachineSnapshot:
         module = self._linuxcnc()
         if self._stat is None:
             self._stat = module.stat()
         stat = self._stat
         stat.poll()
+        mapping = self._mapping(stat, module)
         mask = int(stat.axis_mask)
         indices = [i for i in range(len(AXIS_LETTERS)) if mask & (1 << i)]
         names = [AXIS_LETTERS[i] for i in indices]
         axes = tuple(
-            self._axis(stat, joint, index, name)
-            for joint, (index, name) in enumerate(zip(indices, names, strict=True))
+            self._axis(stat, mapping.joints_for(name), index, name)
+            for index, name in zip(indices, names, strict=True)
         )
         spindle = _item(getattr(stat, "spindle", ()), 0, {}) or {}
         index = int(getattr(stat, "g5x_index", 1))
@@ -121,17 +131,40 @@ class LinuxCNCReader:
             errors=self._drain_errors(module),
         )
 
+    def axis_mapping(self) -> AxisMap:
+        """Odświeża stan przed użyciem mapowania do polecenia."""
+        with self._lock:
+            self.read()
+            if self._axis_map is None:
+                raise AxisMapError("brak mapowania jointów")
+            return self._axis_map
+
+    def _mapping(self, stat: Any, module: Any) -> AxisMap:
+        filename = getattr(stat, "ini_filename", "")
+        if not filename:
+            raise AxisMapError("brak INI działającej instancji LinuxCNC")
+        try:
+            mapping = AxisMap.from_ini(module.ini(filename), module)
+        except Exception as exc:
+            raise AxisMapError(f"nie można odczytać mapowania z INI: {exc}") from exc
+        if self._axis_map is not None and (
+                filename != self._ini_filename or mapping != self._axis_map):
+            raise AxisMapError("mapowanie INI zmieniło się; wymagany ponowny rozruch aplikacji")
+        self._axis_map, self._ini_filename = mapping, filename
+        self._axis_map.validate_state(stat)
+        return self._axis_map
+
     @staticmethod
-    def _axis(stat: Any, joint: int, index: int, name: str) -> AxisSnapshot:
+    def _axis(stat: Any, joints: tuple[int, ...], index: int, name: str) -> AxisSnapshot:
         limits = _item(getattr(stat, "axis", ()), index, {}) or {}
         return AxisSnapshot(
             name=name,
             position=float(_item(stat.actual_position, index, 0.0)),
             commanded=float(_item(stat.position, index, 0.0)),
-            homed=bool(_item(stat.homed, joint, False)),
+            homed=all(bool(stat.homed[joint]) for joint in joints),
             soft_min=float(limits.get("min_position_limit", float("-inf"))),
             soft_max=float(limits.get("max_position_limit", float("inf"))),
-            limit_hit=bool(_item(getattr(stat, "limit", ()), joint, 0)),
+            limit_hit=any(bool(stat.limit[joint]) for joint in joints),
         )
 
     @staticmethod

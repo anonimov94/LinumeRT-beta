@@ -20,6 +20,7 @@ import importlib
 import time
 from typing import Any
 
+from linumert.cnc.axis_map import AxisMap, AxisMapError
 from linumert.cnc.linuxcnc_reader import LinuxCNCReader
 from linumert.cnc.model import MachineSnapshot, Mode
 
@@ -40,7 +41,7 @@ class LinuxCNCBackend:
         self._module = module
         self._timeout = timeout
         self._command: Any = None
-        # Czytnik sam tworzy `linuxcnc.stat()`; nazwy osi bierze z `stat.axis_mask`.
+        # Czytnik wiąże INI działającej instancji z jej stanem NML.
         self.reader = reader or LinuxCNCReader(module=module)
         # Wiek migawki liczymy tym samym zegarem, którym czytnik ją stempluje.
         self._clock = getattr(self.reader, "_clock", time.monotonic)
@@ -80,6 +81,8 @@ class LinuxCNCBackend:
     def snapshot(self) -> MachineSnapshot:
         try:
             return self.reader.read()
+        except AxisMapError as exc:
+            raise SafetyRefused(str(exc)) from exc
         except Exception as exc:
             raise BackendUnavailable(f"odczyt stanu LinuxCNC nie powiódł się: {exc}") from exc
 
@@ -104,10 +107,16 @@ class LinuxCNCBackend:
         self._wait()
 
     def home(self, axis: str | None) -> None:
-        if axis is None:
-            self._cmd().home(-1)
-            return
-        self._cmd().home(self._joint(axis))
+        try:
+            target = self._mapping().home_target(axis)
+        except AxisMapError as exc:
+            raise SafetyRefused(str(exc)) from exc
+        cmd = self._cmd()
+        cmd.mode(self._lc().MODE_MANUAL)
+        self._wait()
+        cmd.teleop_enable(0)
+        self._wait()
+        cmd.home(target)
 
     def mdi(self, text: str) -> None:
         self._cmd().mode(self._lc().MODE_MDI)
@@ -155,48 +164,50 @@ class LinuxCNCBackend:
         cmd.mdi(f"S{speed:g} {code}")
 
     def jog(self, axis: str, speed: float) -> None:
+        if speed == 0.0:
+            self.jog_stop(axis)
+            return
+        index = self._axis(axis)
         cmd = self._cmd()
         cmd.mode(self._lc().MODE_MANUAL)
         self._wait()
-        if speed == 0.0:
-            cmd.jog(self._lc().JOG_STOP, False, self._axis(axis))
-            return
         cmd.teleop_enable(1)
         self._wait()
-        cmd.jog(self._lc().JOG_CONTINUOUS, False, self._axis(axis), speed)
+        cmd.jog(self._lc().JOG_CONTINUOUS, False, index, speed)
 
     def jog_increment(self, axis: str, speed: float, distance: float) -> None:
+        index = self._axis(axis)
         cmd = self._cmd()
         cmd.mode(self._lc().MODE_MANUAL)
         self._wait()
         cmd.teleop_enable(1)
         self._wait()
-        cmd.jog(self._lc().JOG_INCREMENT, False, self._axis(axis), speed, distance)
+        cmd.jog(self._lc().JOG_INCREMENT, False, index, speed, distance)
 
     def jog_stop(self, axis: str | None) -> None:
-        cmd = self._cmd()
-        if axis is None:
-            for name in self.snapshot().axis_names:
-                cmd.jog(self._lc().JOG_STOP, False, self._axis(name))
-            return
-        cmd.jog(self._lc().JOG_STOP, False, self._axis(axis))
+        # Wysyłamy ABORT również w trybie joint i przy uszkodzonym INI/NML.
+        # Nie uzależniamy zatrzymania od poprawności mapowania ani odczytu stanu.
+        self._cmd().abort()
 
     def set_work_offset(self, name: str, values: dict[str, float]) -> None:
         raise Conflict("ustawienie offsetu w LinuxCNC idzie przez MDI (G10 L2); "
                        "użyj machine.mdi albo offset.set z generacją G10")
 
     # ---- pomocnicze --------------------------------------------------------
-    def _axis(self, axis: str) -> int:
-        self._joint(axis)  # walidacja obecności osi
-        return "XYZABCUVW".index(axis.upper())
+    def _mapping(self) -> AxisMap:
+        try:
+            return self.reader.axis_mapping()
+        except AxisMapError as exc:
+            raise SafetyRefused(str(exc)) from exc
+        except Exception as exc:
+            raise BackendUnavailable(f"brak aktualnego mapowania LinuxCNC: {exc}") from exc
 
-    def _joint(self, axis: str) -> int:
-        """Numer jointa z nazwy osi; lista osi pochodzi z migawki (``stat.axis_mask``)."""
-        names = list(self.snapshot().axis_names)
-        letter = axis.upper()
-        if letter not in names:
-            raise SafetyRefused(f"nieznana oś {axis!r}", details={"axes": names})
-        return names.index(letter)
+    def _axis(self, axis: str) -> int:
+        try:
+            self._mapping().joints_for(axis)
+        except AxisMapError as exc:
+            raise SafetyRefused(str(exc)) from exc
+        return "XYZABCUVW".index(axis.upper())
 
     def close(self) -> None:
         self._command = None
